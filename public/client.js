@@ -312,12 +312,18 @@ function renderAction(s) {
 
 function renderContributeUI(s, card) {
   const income = s.you.income;
+  // Equal share = each citizen's slice of the round minimum. If everyone gives
+  // this, the nation exactly meets the requirement. Capped at your income.
+  const aliveCount = Math.max(1, s.players.filter((p) => p.alive).length);
+  const fairShare = Math.min(income, Math.ceil(s.roundThreshold / aliveCount));
+
   pendingContribution = Math.min(pendingContribution, income);
   card.innerHTML = `
     <h3>Your move — Round ${s.round}</h3>
     <p class="muted">You earned <b style="color:var(--gold)">${income}</b> income. How much do you give to the nation?</p>
     <div class="threshold-note">🏗 Citizens must pool <b>${s.roundThreshold}</b> Coins together this round to build
       <b>${cap(s.infraFocus)}</b> — fall short and Prosperity drops <b>${s.neglectPenalty}</b> with no construction.</div>
+    <button id="btn-fairshare" class="btn fairshare" data-amount="${fairShare}">⚖ Donate equal share (${fairShare}) to meet the minimum</button>
     <div class="contribute-ui">
       <div class="split"><span>Keep <b id="keep-amt">${income - pendingContribution}</b></span><span>Contribute <b id="give-amt">${pendingContribution}</b></span></div>
       <input id="contrib-range" type="range" min="0" max="${income}" value="${pendingContribution}" />
@@ -339,6 +345,9 @@ function renderContributeUI(s, card) {
   range.oninput = (e) => update(e.target.value);
   card.querySelectorAll('[data-frac]').forEach((b) => {
     b.onclick = () => update(Math.round(income * parseFloat(b.dataset.frac)));
+  });
+  card.querySelectorAll('[data-amount]').forEach((b) => {
+    b.onclick = () => update(parseInt(b.dataset.amount, 10));
   });
   $('btn-contribute').onclick = () => sendMsg({ type: 'contribute', amount: pendingContribution });
 }

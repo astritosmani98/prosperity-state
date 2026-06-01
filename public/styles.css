@@ -141,6 +141,11 @@ input:focus { outline: none; border-color: var(--gold); }
 .contribute-ui .split { display: flex; justify-content: space-between; font-size: 1.05rem; margin: 10px 0; }
 .contribute-ui .split b { color: var(--gold); }
 .contribute-ui input[type="range"] { width: 100%; accent-color: var(--gold); height: 28px; }
+.btn.fairshare {
+  margin: 0 0 6px; background: rgba(96,165,250,.14); border-color: var(--blue);
+  color: #cfe0ff; font-size: .9rem;
+}
+.btn.fairshare:hover { background: rgba(96,165,250,.24); }
 .quick-btns { display: flex; gap: 6px; margin: 8px 0; }
 .quick-btns .btn { font-size: .82rem; padding: 7px; margin: 0; }
 .vote-option { text-align: left; margin-top: 8px; line-height: 1.35; }

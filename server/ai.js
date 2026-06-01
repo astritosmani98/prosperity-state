@@ -17,6 +17,17 @@ const BASE_FRACTION = {
   freerider: 0.2,
 };
 
+// Endgame greed, per archetype. `start` = share of the goal where selfishness
+// begins; `cut` = how much contribution is throttled by the time Prosperity hits
+// the goal (0 = never hoards, 1 = stops giving entirely). Opportunists turn
+// ruthless early and hard; builders stay loyal to the cause.
+const ENDGAME = {
+  builder:     { start: 1.0,  cut: 0.0 },
+  strategist:  { start: 0.75, cut: 0.8 },
+  opportunist: { start: 0.6,  cut: 1.0 },
+  freerider:   { start: 0.7,  cut: 1.0 },
+};
+
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 
 /**
@@ -32,28 +43,32 @@ export function decideContribution(state, bot) {
   const goal = CONFIG.PROSPERITY_GOAL;
   const living = alivePlayers(state);
 
+  const lateGame = P >= goal * 0.85;
+
   // --- Collapse avoidance: if society is fragile, everyone chips in more. ---
   if (P <= 15) fraction = Math.max(fraction, 0.7);
   if (P <= 8) fraction = Math.max(fraction, 0.9);
 
-  // --- Endgame hoarding: as we near the goal, self-interested bots keep more. ---
-  // (Builders keep pushing; they care about reaching the goal.)
-  if (P >= goal * 0.8 && bot.archetype !== 'builder') {
-    const nearness = (P - goal * 0.8) / (goal * 0.2); // 0..1 across the final stretch
-    fraction *= 1 - 0.6 * nearness;
-  }
-
-  // --- Opportunist: try to snipe the Top Contributor bonus when others hold back. ---
-  if (bot.archetype === 'opportunist') {
-    const avgIncome = income; // everyone earns the same base income each round
+  // --- Opportunist: snipe the Top Contributor bonus when others hold back (early/mid only). ---
+  if (bot.archetype === 'opportunist' && P < goal * 0.6) {
     const othersLikelyLow = living.length <= 3 || P < 30;
     if (othersLikelyLow) fraction = Math.max(fraction, 0.65);
-    void avgIncome;
   }
 
-  // --- Freerider: still self-preserves near collapse, otherwise coasts. ---
+  // --- Freerider: self-preserves near collapse, otherwise coasts. ---
   if (bot.archetype === 'freerider' && P > 25) {
     fraction = Math.min(fraction, 0.25);
+  }
+
+  // --- Endgame selfishness: as the goal nears, self-interested archetypes keep
+  //     more of their income to climb the final wealth ranking. Builders never
+  //     hoard — they care about reaching 100. `start` = fraction of the goal at
+  //     which greed kicks in; `cut` = how hard contribution is throttled by P=100.
+  const eg = ENDGAME[bot.archetype] || { start: 0.8, cut: 0.6 };
+  if (eg.cut > 0 && P >= goal * eg.start) {
+    const span = goal - goal * eg.start || 1;
+    const nearness = clamp((P - goal * eg.start) / span, 0, 1);
+    fraction *= 1 - eg.cut * nearness;
   }
 
   // Add a little noise so bots don't move in lockstep.
@@ -63,9 +78,15 @@ export function decideContribution(state, bot) {
   let amount = clamp(Math.round(income * fraction), 0, income);
 
   // Pull their weight toward the maintenance minimum so the nation keeps building.
-  // Free-riders only do this when collapse is near; everyone else chips in their share.
+  // Builders & strategists always cover their share; opportunists do too, EXCEPT
+  // in the late game when their greed takes over; free-riders never (until collapse).
   const fairShare = Math.ceil(roundThreshold(state) / Math.max(1, living.length));
-  if (bot.archetype !== 'freerider' || P <= 15) {
+  const coversShare =
+    P <= 15 ||
+    bot.archetype === 'builder' ||
+    bot.archetype === 'strategist' ||
+    (bot.archetype === 'opportunist' && !lateGame);
+  if (coversShare) {
     amount = Math.max(amount, Math.min(income, fairShare));
   }
 
