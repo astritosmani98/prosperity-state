@@ -165,6 +165,20 @@ input:focus { outline: none; border-color: var(--gold); }
 .tag.host { background: #432; color: var(--gold); }
 .tag.locked { background: #1d3a2b; color: var(--green); }
 .tag.waiting { background: #333; color: var(--muted); }
+.tag.freerider { background: #4a1d1d; color: var(--red); }
+
+/* free-rider warning banner */
+.freerider-banner {
+  margin: 0 22px; margin-top: 12px; padding: 11px 16px;
+  background: rgba(248,113,113,.12); border: 1px solid var(--red); border-radius: 10px;
+  color: #ffd9d9; font-size: .9rem; line-height: 1.4;
+  animation: pulse-red 2s ease-in-out infinite;
+}
+.freerider-banner b { color: #fff; }
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,.0); }
+  50% { box-shadow: 0 0 0 4px rgba(248,113,113,.12); }
+}
 .coins-cell { color: var(--gold); font-weight: 700; }
 
 /* last round */

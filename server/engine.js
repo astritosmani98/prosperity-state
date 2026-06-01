@@ -69,6 +69,14 @@ export function neglectPenalty(state) {
   return CONFIG.NEGLECT_BASE + Math.floor(state.prosperity / CONFIG.NEGLECT_SCALE_DIV);
 }
 
+/** Living players whose cooperation reputation has fallen into free-rider territory. */
+export function detectFreeRiders(state) {
+  if (state.round <= CONFIG.FREERIDER_GRACE_ROUNDS) return [];
+  return alivePlayers(state)
+    .filter((p) => (p.coopScore ?? 0.5) < CONFIG.FREERIDER_THRESHOLD)
+    .map((p) => ({ id: p.id, name: p.name }));
+}
+
 /** The category the focus would move to next (next un-maxed, wrapping). */
 export function nextFocusCategory(state) {
   const cats = CONFIG.INFRA_CATEGORIES;
@@ -106,6 +114,7 @@ export function createGame(seats) {
       influence: CONFIG.MIN_INFLUENCE,
       contributedThisRound: null, // null = not submitted yet
       lastContribution: null,     // what they gave in the most recent resolved round
+      coopScore: 0.5,             // rolling cooperation reputation (0..1); 0.5 = neutral start
       submitted: false,
       alive: true,
       bankrupt: false,
@@ -191,6 +200,9 @@ export function resolveRound(state, rng = Math.random) {
     p.coins -= c;
     contributions[p.id] = c;
     p.lastContribution = c; // persisted so the UI can always show who gave what
+    // Update cooperation reputation: share of income contributed, smoothed.
+    const ratio = p.income > 0 ? clamp(c / p.income, 0, 1) : 0;
+    p.coopScore = CONFIG.COOP_EMA * (p.coopScore ?? 0.5) + (1 - CONFIG.COOP_EMA) * ratio;
     pool += c;
   }
 
@@ -340,12 +352,18 @@ export function resolveRound(state, rng = Math.random) {
     topContributors,
     upgrades,
     bankrupted,
+    freeRiders: detectFreeRiders(state),
   };
   state.lastRoundResult = result;
 
   // Narrative log.
   if (belowThreshold) {
-    logEvent(state, `Round ${state.round}: only ${pool}/${threshold} Coins pooled — below minimum. Nothing built, −${neglect} Prosperity. Now ${state.prosperity}.`);
+    const fr = result.freeRiders.map((f) => f.name).join(', ');
+    if (fr) {
+      logEvent(state, `Round ${state.round}: citizens withheld in protest — ${fr} won't contribute. Nothing built, −${neglect} Prosperity. Now ${state.prosperity}.`);
+    } else {
+      logEvent(state, `Round ${state.round}: only ${pool}/${threshold} Coins pooled — below minimum. Nothing built, −${neglect} Prosperity. Now ${state.prosperity}.`);
+    }
   } else {
     logEvent(state, `Round ${state.round} resolved: pool ${pool} Coins → +${deltaP} Prosperity (cost K=${K}). Prosperity now ${state.prosperity}.`);
   }

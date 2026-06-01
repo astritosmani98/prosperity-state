@@ -9,6 +9,16 @@
 import { CONFIG } from './constants.js';
 import { alivePlayers, roundThreshold } from './engine.js';
 
+// How far each archetype will keep cooperating while protesting a free-rider.
+// Higher = holds out a little longer, but everyone still cuts enough that the
+// round minimum is missed and Prosperity slides.
+const PROTEST_LOYALTY = {
+  builder: 1.6,
+  strategist: 1.1,
+  opportunist: 0.8,
+  freerider: 0.5,
+};
+
 // Base contribution fraction of income, per archetype.
 const BASE_FRACTION = {
   builder: 0.85,
@@ -37,13 +47,40 @@ export function decideContribution(state, bot) {
   const income = bot.income;
   if (income <= 0) return 0;
 
-  let fraction = BASE_FRACTION[bot.archetype] ?? 0.5;
-
   const P = state.prosperity;
   const goal = CONFIG.PROSPERITY_GOAL;
   const living = alivePlayers(state);
-
   const lateGame = P >= goal * 0.85;
+  const fairShare = Math.ceil(roundThreshold(state) / Math.max(1, living.length));
+  const fairShareFrac = clamp(fairShare / income, 0, 1);
+
+  let fraction = BASE_FRACTION[bot.archetype] ?? 0.5;
+
+  // ===== Conditional cooperation =====
+  // Look at the LEAST cooperative other citizen. If someone is persistently
+  // free-riding, cooperative bots refuse to keep subsidizing them: they pull
+  // their own giving down toward the offender's level, so the round minimum is
+  // missed and Prosperity falls — pressure that only lifts once the free-rider
+  // starts paying in (which raises their cooperation score back up).
+  const others = living.filter((p) => p.id !== bot.id);
+  const worstCoop = others.length ? Math.min(...others.map((p) => p.coopScore ?? 0.5)) : 1;
+  const freeRiderPresent =
+    state.round > CONFIG.FREERIDER_GRACE_ROUNDS && worstCoop < CONFIG.FREERIDER_THRESHOLD;
+
+  if (freeRiderPresent) {
+    const loyalty = PROTEST_LOYALTY[bot.archetype] ?? 1;
+    fraction = Math.min(fraction, worstCoop * loyalty);
+    // A free-rider bot only relents once the decline is actually hurting the nation.
+    if (bot.archetype === 'freerider') {
+      const last = state.lastRoundResult;
+      const hurting = last && (last.belowThreshold || last.deltaP < 0);
+      if (hurting || P <= 12) fraction = Math.max(fraction, fairShareFrac);
+    }
+    fraction += (Math.random() - 0.5) * 0.05;
+    return clamp(Math.round(income * clamp(fraction, 0, 1)), 0, income);
+  }
+
+  // ===== Normal cooperation (no free-rider) =====
 
   // --- Collapse avoidance: if society is fragile, everyone chips in more. ---
   if (P <= 15) fraction = Math.max(fraction, 0.7);
@@ -80,7 +117,6 @@ export function decideContribution(state, bot) {
   // Pull their weight toward the maintenance minimum so the nation keeps building.
   // Builders & strategists always cover their share; opportunists do too, EXCEPT
   // in the late game when their greed takes over; free-riders never (until collapse).
-  const fairShare = Math.ceil(roundThreshold(state) / Math.max(1, living.length));
   const coversShare =
     P <= 15 ||
     bot.archetype === 'builder' ||
@@ -94,7 +130,8 @@ export function decideContribution(state, bot) {
 }
 
 /**
- * Decide a bot's vote for the current pending vote, returning an option id.
+ * Decide a bot's vote — purely in its own self-interest, based on its current
+ * wealth position rather than its archetype's ideals.
  */
 export function decideVote(state, bot) {
   const vote = state.pendingVote;
@@ -103,37 +140,30 @@ export function decideVote(state, bot) {
   const pick = (...prefs) => prefs.find((id) => optionIds.includes(id)) || optionIds[0];
 
   const living = alivePlayers(state);
-  const richest = living.reduce((a, b) => (b.coins > a.coins ? b : a), living[0]);
-  const poorest = living.reduce((a, b) => (b.coins < a.coins ? b : a), living[0]);
-  const amRichest = richest && richest.id === bot.id;
-  const amPoorest = poorest && poorest.id === bot.id;
-
-  if (vote.type === 'infraFocus') {
-    switch (bot.archetype) {
-      case 'builder':     return pick('education', 'roads', 'energy');
-      case 'strategist':  return pick('energy', 'education', 'roads');
-      case 'opportunist': return pick('industry', 'roads', 'education');
-      case 'freerider':   return pick('industry', 'roads', 'healthcare');
-      default:            return pick('roads');
-    }
-  }
+  const coins = living.map((p) => p.coins);
+  const maxCoins = Math.max(...coins);
+  const minCoins = Math.min(...coins);
+  const amRichest = bot.coins >= maxCoins;
+  const amPoorest = bot.coins <= minCoins;
+  // Rank 0 = richest. Used to judge whether redistribution helps or hurts me.
+  const richerThanMe = living.filter((p) => p.coins > bot.coins).length;
+  const inBottomHalf = richerThanMe >= living.length / 2;
 
   if (vote.type === 'taxPolicy') {
-    switch (bot.archetype) {
-      case 'builder':     return pick('progressive', 'flat');
-      case 'strategist':  return pick(amRichest ? 'flat' : 'progressive', 'flat');
-      case 'opportunist': return pick(amRichest ? 'flat' : 'progressive', 'flat');
-      case 'freerider':   return pick('flat', 'progressive');
-      default:            return pick('flat');
-    }
+    // The progressive levy only taxes the single richest citizen. So the leader
+    // votes flat to protect their pile; everyone else is happy to tax the leader
+    // (it grows the pool — and Prosperity — at someone else's expense).
+    return pick(amRichest ? 'flat' : 'progressive', 'flat');
   }
 
-  // welfarePolicy
-  switch (bot.archetype) {
-    case 'builder':     return pick('expansion', 'welfare');
-    case 'strategist':  return pick('expansion', 'welfare');
-    case 'opportunist': return pick(amPoorest ? 'welfare' : 'expansion', 'expansion');
-    case 'freerider':   return pick(amPoorest ? 'welfare' : 'expansion', 'welfare');
-    default:            return pick('expansion');
+  if (vote.type === 'welfarePolicy') {
+    // Welfare skims the pool to the poorest citizen. If I'm at or near the bottom
+    // (or at real bankruptcy risk) that's me — vote welfare. Otherwise I'd rather
+    // every Coin drove growth I benefit from, so vote expansion.
+    const struggling = amPoorest || inBottomHalf || bot.coins <= bot.income * 1.5;
+    return pick(struggling ? 'welfare' : 'expansion', 'expansion');
   }
+
+  // Fallback for any other vote type: keep the status quo / first option.
+  return pick(optionIds[0]);
 }

@@ -10,6 +10,7 @@ import {
   createGame, beginRound, submitContribution, allContributionsIn, resolveRound,
   shouldVote, startVote, submitVote, allVotesIn, resolveVote,
   alivePlayers, computeIncome, nextInfraCost, roundThreshold, neglectPenalty, nextFocusCategory,
+  detectFreeRiders,
 } from './engine.js';
 import { decideContribution, decideVote } from './ai.js';
 import { CONFIG, BOT_ARCHETYPES, BOT_NAMES } from './constants.js';
@@ -276,6 +277,8 @@ export class Room {
   serializeState(forId) {
     const s = this.state;
     const reveal = s.phase !== 'contribute'; // hide contribution amounts until resolved
+    const freeRiders = detectFreeRiders(s);
+    const freeRiderIds = new Set(freeRiders.map((f) => f.id));
     const players = [...this.players.values()]
       .map((rec) => {
         const ep = s.players[rec.id];
@@ -288,6 +291,7 @@ export class Room {
           voted: s.pendingVote ? s.pendingVote.votes[ep.id] != null : false,
           contribution: reveal ? ep.contributedThisRound : null,
           lastContribution: ep.lastContribution, // persists across rounds for display
+          freeRider: ep.alive && freeRiderIds.has(ep.id),
         };
       });
 
@@ -308,6 +312,7 @@ export class Room {
       infraMaxLevel: CONFIG.INFRA_MAX_LEVEL,
       roundThreshold: roundThreshold(s),
       neglectPenalty: neglectPenalty(s),
+      freeRiders, // [{id,name}] currently dragging the nation down
       taxPolicy: s.taxPolicy,
       welfarePolicy: s.welfarePolicy,
       players,

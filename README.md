@@ -45,6 +45,11 @@ process with no database.
 Hit **0 Coins** and you go bankrupt — out of the final ranking. If Prosperity
 ever falls to **0**, society collapses and everyone loses.
 
+**Don't try to free-ride to victory.** Bots practice *conditional cooperation*:
+if you persistently contribute almost nothing, they stop covering for you and
+withhold too — so Prosperity slides downward until you start paying your fair
+share. Refuse for too long and the nation collapses, and nobody wins.
+
 ## Systems implemented (GDD v1.1)
 
 - Personal economy (income, keep/contribute, bankruptcy floor at 0)
@@ -52,8 +57,12 @@ ever falls to **0**, society collapses and everyone loses.
 - **Minimum maintenance threshold** — miss it and nothing is built while
   Prosperity decays (penalty grows late-game)
 - Top Contributor bonus (20% refund, ties share it)
+- **Free-rider deterrence** — bots track each citizen's cooperation and withhold
+  in protest of persistent free-riders, so refusing to contribute drags the
+  nation down instead of letting you coast to a wealth win
 - Influence with 20%/round decay and a permanent floor of 1
-- Influence-weighted voting every 3 rounds (tax & welfare policy)
+- Influence-weighted voting every 3 rounds — bots vote in their own
+  self-interest (the leader blocks taxes; the poorest push welfare)
 - All 5 infrastructure tracks (Roads, Education, Energy, Healthcare, Industry),
   levels 1–5, each with independent progress; the build focus **auto-rotates
   every round** so construction spreads across the nation

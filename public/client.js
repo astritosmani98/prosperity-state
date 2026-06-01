@@ -161,12 +161,29 @@ function renderGame(s) {
   const meRow = s.players.find((p) => p.id === me.id);
   $('you-influence').textContent = meRow ? meRow.influence : 1;
 
+  renderFreeRiderBanner(s);
   renderPlayers(s);
   renderInfra(s);
   renderPolicies(s);
   renderLastRound(s);
   renderLog(s);
   renderAction(s);
+}
+
+function renderFreeRiderBanner(s) {
+  const banner = $('freerider-banner');
+  const fr = s.freeRiders || [];
+  if (!fr.length) { banner.classList.add('hidden'); return; }
+  banner.classList.remove('hidden');
+  const meIsFr = fr.some((f) => f.id === me.id);
+  if (meIsFr) {
+    banner.innerHTML = `⚠ <b>You're being treated as a free-rider.</b> The other citizens have stopped
+      pulling your weight, so Prosperity is <b>falling</b>. Start contributing your fair share to restore cooperation.`;
+  } else {
+    const names = fr.map((f) => escapeHtml(f.name)).join(', ');
+    banner.innerHTML = `⚠ <b>${names}</b> ${fr.length > 1 ? 'are' : 'is'} free-riding. Citizens are withholding
+      in protest — Prosperity will keep <b>falling</b> until they contribute.`;
+  }
 }
 
 function renderPlayers(s) {
@@ -185,6 +202,7 @@ function renderPlayers(s) {
     let tags = '';
     if (p.isBot) tags += '<span class="tag bot">AI</span>';
     if (p.isHost) tags += '<span class="tag host">host</span>';
+    if (p.freeRider) tags += '<span class="tag freerider">free-rider</span>';
 
     // "Gave" persists across rounds. During the contribute phase, also show whether
     // THIS round's contribution is locked in (amount stays hidden until resolve).
