@@ -1,0 +1,20 @@
+{
+  "name": "prosperity-state",
+  "version": "1.1.0",
+  "description": "Prosperity State — a multiplayer economic & political strategy game. Reach national Prosperity 100, then the richest survivor wins.",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node server/engine.test.js",
+    "sim": "node server/sim.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "license": "MIT"
+}

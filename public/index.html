@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Prosperity State</title>
+<link rel="stylesheet" href="styles.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ================= HOME ================= -->
+  <section id="screen-home" class="screen active">
+    <div class="home-hero">
+      <h1 class="logo">PROSPERITY&nbsp;STATE</h1>
+      <p class="tagline">Build a nation to Prosperity 100 — but only the richest survivor wins.</p>
+
+      <div class="home-cards">
+        <div class="card">
+          <h2>Create a nation</h2>
+          <label>Your name
+            <input id="create-name" type="text" maxlength="16" placeholder="e.g. Mira" />
+          </label>
+          <button id="btn-create" class="btn primary">Create game</button>
+        </div>
+
+        <div class="card">
+          <h2>Join a nation</h2>
+          <label>Your name
+            <input id="join-name" type="text" maxlength="16" placeholder="e.g. Theo" />
+          </label>
+          <label>Room code
+            <input id="join-code" type="text" maxlength="4" placeholder="ABCD" class="code-input" />
+          </label>
+          <button id="btn-join" class="btn">Join game</button>
+        </div>
+      </div>
+      <p class="connection-note" id="home-error"></p>
+      <details class="rules">
+        <summary>How to play</summary>
+        <ul>
+          <li>Each round you earn <b>income</b> (it grows as national Prosperity rises).</li>
+          <li>Secretly choose how much to <b>keep</b> vs <b>contribute</b> to the nation.</li>
+          <li>Contributions raise <b>Prosperity</b>; generous rounds are far more efficient.</li>
+          <li>The single biggest giver each round gets a <b>20% refund</b> (Top Contributor bonus).</li>
+          <li>Every 3 rounds you <b>vote</b> on policy — votes are weighted by your <b>Influence</b>.</li>
+          <li>Hit <b>0 Coins</b> and you go bankrupt, out of the final ranking.</li>
+          <li>When Prosperity reaches <b>100</b> the game ends instantly — richest survivor wins.</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <!-- ================= LOBBY ================= -->
+  <section id="screen-lobby" class="screen">
+    <div class="card lobby-card">
+      <h2>Lobby</h2>
+      <div class="room-code">
+        <span>Room code</span>
+        <strong id="lobby-code">----</strong>
+        <button id="btn-copy" class="btn tiny">Copy</button>
+      </div>
+      <p class="muted">Share this code so friends can join from any device.</p>
+
+      <h3>Players</h3>
+      <ul id="lobby-players" class="player-pills"></ul>
+
+      <div id="host-controls">
+        <label class="slider-row">
+          Total seats: <strong id="target-label">2</strong>
+          <input id="target-range" type="range" min="2" max="6" value="2" />
+        </label>
+        <p class="muted" id="bot-note"></p>
+        <button id="btn-start" class="btn primary">Start game</button>
+      </div>
+      <p id="lobby-waiting" class="muted hidden">Waiting for the host to start…</p>
+    </div>
+  </section>
+
+  <!-- ================= GAME ================= -->
+  <section id="screen-game" class="screen">
+    <header class="topbar">
+      <div class="prosperity-block">
+        <div class="prosperity-head">
+          <span>NATIONAL PROSPERITY</span>
+          <span id="prosperity-num">10 / 100</span>
+        </div>
+        <div class="prosperity-bar"><div id="prosperity-fill"></div></div>
+      </div>
+      <div class="round-block">
+        <div class="round-num">Round <strong id="round-num">1</strong></div>
+        <div id="phase-badge" class="phase-badge">—</div>
+      </div>
+    </header>
+
+    <div class="game-grid">
+      <!-- LEFT: you + action -->
+      <div class="col col-action">
+        <div class="card you-card">
+          <h3>You</h3>
+          <div class="stat-row">
+            <div class="stat"><span class="stat-val" id="you-coins">30</span><span class="stat-lbl">Coins</span></div>
+            <div class="stat"><span class="stat-val" id="you-income">0</span><span class="stat-lbl">Income</span></div>
+            <div class="stat"><span class="stat-val" id="you-influence">1</span><span class="stat-lbl">Influence</span></div>
+          </div>
+        </div>
+
+        <div class="card action-card" id="action-card">
+          <!-- populated per phase -->
+        </div>
+      </div>
+
+      <!-- MIDDLE: players + nation -->
+      <div class="col col-center">
+        <div class="card">
+          <h3>Citizens</h3>
+          <table class="players-table">
+            <thead><tr><th>Name</th><th>Coins</th><th>Infl.</th><th>Gave</th><th>Status</th></tr></thead>
+            <tbody id="players-body"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Last round</h3>
+          <div id="last-round" class="last-round muted">The first round hasn't resolved yet.</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: infrastructure + log -->
+      <div class="col col-side">
+        <div class="card">
+          <h3>National infrastructure</h3>
+          <p class="infra-meta" id="infra-meta"></p>
+          <div id="infra-list" class="infra-list"></div>
+          <div class="policies">
+            <span class="pill" id="policy-tax">Tax: flat</span>
+            <span class="pill" id="policy-welfare">Expansion</span>
+          </div>
+        </div>
+        <div class="card log-card">
+          <h3>Chronicle</h3>
+          <div id="log" class="log"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GAME OVER ================= -->
+  <section id="screen-over" class="screen">
+    <div class="card over-card">
+      <h2 id="over-title">Game over</h2>
+      <p id="over-sub" class="muted"></p>
+      <ol id="ranking" class="ranking"></ol>
+      <button id="btn-again" class="btn primary">Back to menu</button>
+    </div>
+  </section>
+
+</div>
+<script src="client.js"></script>
+</body>
+</html>
