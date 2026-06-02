@@ -17,7 +17,8 @@ npm start
 ```
 
 Then open <http://localhost:3000>. Create a game, share the room code, and start
-when ready — any empty seats become AI players.
+when ready — any empty seats become AI players. The layout is responsive and
+works on mobile web browsers (phones/tablets) as well as desktop.
 
 ### Play with friends on other devices
 The server must be reachable by the other players. On the same LAN they can use

@@ -22,10 +22,30 @@ body {
   color: var(--text);
   font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
+/* Touch-friendly sliders (big gold thumb on every range input) */
+input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 6px; border-radius: 999px;
+  background: var(--line); outline: none; touch-action: pan-y;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--gold-deep);
+  box-shadow: 0 2px 6px rgba(0,0,0,.4); cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--gold); border: 2px solid var(--gold-deep); cursor: pointer;
 }
 
 /* ---------- screens ---------- */
-.screen { display: none; min-height: 100vh; }
+.screen { display: none; min-height: 100vh; min-height: 100dvh; }
 .screen.active { display: block; }
 #screen-home.active, #screen-lobby.active, #screen-over.active {
   display: flex; align-items: center; justify-content: center; padding: 24px;
@@ -95,10 +115,10 @@ input:focus { outline: none; border-color: var(--gold); }
 }
 .player-pills li.host::after { content: " ★"; color: var(--gold); }
 .slider-row { display: flex; align-items: center; gap: 12px; color: var(--text); }
-.slider-row input[type="range"] { flex: 1; accent-color: var(--gold); }
+.slider-row input[type="range"] { flex: 1; }
 
 /* ---------- game layout ---------- */
-#screen-game.active { display: flex; flex-direction: column; min-height: 100vh; }
+#screen-game.active { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
 .topbar {
   display: flex; align-items: center; gap: 24px;
   padding: 14px 22px; background: rgba(10,15,28,.7); border-bottom: 1px solid var(--line);
@@ -140,7 +160,7 @@ input:focus { outline: none; border-color: var(--gold); }
 .action-card { min-height: 180px; }
 .contribute-ui .split { display: flex; justify-content: space-between; font-size: 1.05rem; margin: 10px 0; }
 .contribute-ui .split b { color: var(--gold); }
-.contribute-ui input[type="range"] { width: 100%; accent-color: var(--gold); height: 28px; }
+.contribute-ui input[type="range"] { width: 100%; margin: 10px 0; }
 .btn.fairshare {
   margin: 0 0 6px; background: rgba(96,165,250,.14); border-color: var(--blue);
   color: #cfe0ff; font-size: .9rem;
@@ -379,4 +399,53 @@ input:focus { outline: none; border-color: var(--gold); }
 @media (max-width: 1000px) {
   .game-grid { grid-template-columns: 1fr; }
   .home-cards { grid-template-columns: 1fr; }
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 640px) {
+  /* topbar stays sticky but compact */
+  .topbar { gap: 12px; padding: 10px 12px; }
+  .prosperity-head { font-size: .66rem; margin-bottom: 4px; }
+  .prosperity-bar { height: 12px; }
+  .round-num { font-size: .85rem; }
+  .phase-badge { font-size: .68rem; padding: 3px 9px; }
+
+  /* one column, tighter spacing (respect the bottom safe-area on notched phones) */
+  .game-grid { padding: 10px 10px calc(10px + env(safe-area-inset-bottom)); gap: 12px; }
+  .col { gap: 12px; }
+  .card { padding: 14px; border-radius: 12px; }
+
+  /* home / lobby: top-align so tall content scrolls instead of clipping */
+  #screen-home.active, #screen-lobby.active, #screen-over.active { align-items: flex-start; padding: 16px; }
+  .logo { letter-spacing: .08em; }
+  .tagline { font-size: .95rem; }
+  .home-cards { gap: 12px; }
+  .rules { font-size: .85rem; }
+  .lobby-card, .over-card { width: 100%; }
+  .room-code strong { font-size: 1.7rem; letter-spacing: .25em; }
+  .over-card h2 { font-size: 1.7rem; }
+
+  /* your stats */
+  .stat-val { font-size: 1.35rem; }
+  .stat-lbl { font-size: .64rem; }
+
+  /* the cityscape: a touch shorter so it doesn't dominate the fold */
+  #city-svg { height: clamp(150px, 30vh, 220px); }
+  .cityscape-head h3 { font-size: .85rem; }
+
+  /* citizens table compacts */
+  .players-table { font-size: .82rem; }
+  .players-table th, .players-table td { padding: 6px 4px; }
+  .players-table th { font-size: .66rem; }
+  .tag { font-size: .6rem; padding: 1px 4px; margin-left: 3px; }
+
+  .freerider-banner { margin: 8px 10px 0; font-size: .82rem; padding: 9px 12px; }
+  .infra-meta { font-size: .76rem; }
+  .log-card .log { max-height: 200px; }
+
+  /* comfortable tap targets */
+  .btn { padding: 13px 16px; }
+  .quick-btns { gap: 6px; }
+  .quick-btns .btn { padding: 11px 4px; font-size: .8rem; }
+  .vote-option { padding: 13px 14px; }
 }
