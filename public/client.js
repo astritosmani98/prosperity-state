@@ -215,6 +215,9 @@ function renderCity(s) {
   $('clouds').style.opacity = clampNum(t * 1.3 - 0.15, 0, 1).toFixed(2);
   $('birds').style.opacity = (!declining && p >= 6 ? clampNum(0.5 + t * 0.5, 0, 1) : 0).toFixed(2);
   svg.classList.toggle('night', night > 0.55);
+  // Fireflies come out at dusk/night; pollen drifts on bright days.
+  $('fireflies').style.opacity = clampNum((night - 0.4) * 1.7, 0, 1).toFixed(2);
+  $('motes').style.opacity = (declining ? 0 : clampNum(t - 0.2, 0, 0.75)).toFixed(2);
 
   // Infrastructure objects: appear at level ≥ 1, reveal level-gated pieces,
   // show a level badge, and flash + sparkle on each upgrade.

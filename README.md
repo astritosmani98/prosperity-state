@@ -74,8 +74,9 @@ share. Refuse for too long and the nation collapses, and nobody wins.
   (school, hospital, solar panels + wind turbine, factory), village houses,
   parks, people, cars, birds and a river fill in with Prosperity, a day/night
   cycle tracks the nation's health (bright day → starry night), Energy lights
-  the windows and streetlamps, Industry puffs smoke, upgrades sparkle, and a
-  free-rider decline brings a storm
+  the windows and streetlamps, Industry puffs smoke, upgrades sparkle, kids play
+  by a bridged river that glints with reflections, fireflies come out at dusk,
+  and a free-rider decline brings a storm
 
 All tuning constants live in [`server/constants.js`](server/constants.js).
 
