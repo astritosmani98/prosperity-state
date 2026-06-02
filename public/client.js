@@ -161,6 +161,7 @@ function renderGame(s) {
   const meRow = s.players.find((p) => p.id === me.id);
   $('you-influence').textContent = meRow ? meRow.influence : 1;
 
+  renderCity(s);
   renderFreeRiderBanner(s);
   renderPlayers(s);
   renderInfra(s);
@@ -168,6 +169,119 @@ function renderGame(s) {
   renderLastRound(s);
   renderLog(s);
   renderAction(s);
+}
+
+// ----------------------------------------------------------------------------
+// Cityscape — the society map that visibly grows with Prosperity & infrastructure
+// ----------------------------------------------------------------------------
+let cityPrev = null;  // last-seen infrastructure levels, to detect upgrades
+let rainBuilt = false;
+
+const clampNum = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
+const lerp = (a, b, t) => a + (b - a) * t;
+function hexToRgb(h) { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+function lerpColor(a, b, t) {
+  const A = hexToRgb(a), B = hexToRgb(b);
+  const c = A.map((v, i) => Math.round(lerp(v, B[i], t)).toString(16).padStart(2, '0'));
+  return '#' + c.join('');
+}
+function setStop(id, color) { const el = $(id); if (el) el.setAttribute('stop-color', color); }
+
+function renderCity(s) {
+  const svg = $('city-svg');
+  if (!svg) return;
+  const infra = s.infrastructure || {};
+  const p = clampNum(s.prosperity, 0, 100);
+  const t = p / 100;
+
+  // Sky: gloomy dusk → bright day. Sun rises and warms.
+  setStop('skyTop', lerpColor('#16213c', '#5fa8e8', t));
+  setStop('skyBot', lerpColor('#3a2f3a', '#cfe8ff', t));
+  const sun = $('sun');
+  sun.setAttribute('cy', String(lerp(98, 46, t)));
+  sun.setAttribute('fill', lerpColor('#c9763a', '#fff0a8', t));
+
+  // Infrastructure buildings rise with their level; flash + sparkle on upgrade.
+  for (const cat of ['education', 'healthcare', 'energy', 'industry']) {
+    const el = $('b-' + cat);
+    if (!el) continue;
+    const lvl = infra[cat] || 0;
+    const scale = lvl <= 0 ? 0 : 0.45 + 0.55 * ((lvl - 1) / 4);
+    el.style.transform = `scaleY(${scale.toFixed(3)})`;
+    if (cityPrev && (cityPrev[cat] || 0) < lvl) flashBuilding(el, cat);
+  }
+
+  // Residential skyline, trees and people appear as Prosperity rises.
+  svg.querySelectorAll('.grow').forEach((el) => {
+    const thr = parseFloat(el.dataset.threshold);
+    el.style.transform = p >= thr ? 'scaleY(1)' : 'scaleY(0)';
+  });
+
+  // Energy lights the windows.
+  const energy = infra.energy || 0;
+  svg.classList.toggle('powered', energy > 0);
+  svg.style.setProperty('--energy', (energy / 5).toFixed(2));
+
+  // Industry smokes; Healthcare cleans the air a little.
+  const industry = infra.industry || 0;
+  const smoke = $('smoke');
+  smoke.style.opacity = (industry > 0
+    ? clampNum(industry / 5, 0, 1) * (1 - 0.12 * (infra.healthcare || 0))
+    : 0).toFixed(2);
+
+  // Roads put cars on the street.
+  const roads = infra.roads || 0;
+  const cars = svg.querySelectorAll('#cars .car');
+  const showCars = Math.min(cars.length, 1 + roads);
+  cars.forEach((c, i) => { c.style.display = i < showCars ? '' : 'none'; });
+
+  // Decline (free-riders or a falling round) brings a storm.
+  const declining =
+    (s.freeRiders && s.freeRiders.length > 0) ||
+    (s.lastRoundResult && s.lastRoundResult.deltaP < 0);
+  svg.classList.toggle('storm', !!declining);
+  $('storm-overlay').setAttribute('opacity', declining ? '0.4' : '0');
+  if (declining) buildRain(svg);
+
+  // Status chip.
+  let label;
+  if (s.phase === 'ended') label = 'Prosperous! 🎉';
+  else if (declining) label = 'In decline ⛈';
+  else if (p < 25) label = 'Struggling';
+  else if (p < 55) label = 'Developing';
+  else if (p < 85) label = 'Thriving';
+  else label = 'Flourishing ✨';
+  $('city-status').textContent = label;
+
+  cityPrev = { ...infra };
+}
+
+function flashBuilding(el, cat) {
+  el.classList.remove('flash');
+  requestAnimationFrame(() => el.classList.add('flash'));
+  setTimeout(() => el.classList.remove('flash'), 850);
+  const spark = $('spark-' + cat);
+  if (spark) {
+    spark.classList.remove('go');
+    requestAnimationFrame(() => spark.classList.add('go'));
+    setTimeout(() => spark.classList.remove('go'), 1000);
+  }
+}
+
+function buildRain(svg) {
+  if (rainBuilt) return;
+  const rain = $('rain');
+  for (let i = 0; i < 40; i++) {
+    const x = Math.random() * 800;
+    const y = -10 - Math.random() * 60;
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x.toFixed(1)); line.setAttribute('y1', y.toFixed(1));
+    line.setAttribute('x2', (x - 6).toFixed(1)); line.setAttribute('y2', (y + 14).toFixed(1));
+    line.setAttribute('class', 'raindrop');
+    line.style.animationDelay = (-Math.random() * 0.6).toFixed(2) + 's';
+    rain.appendChild(line);
+  }
+  rainBuilt = true;
 }
 
 function renderFreeRiderBanner(s) {

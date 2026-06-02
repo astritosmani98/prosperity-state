@@ -96,6 +96,127 @@
 
     <div id="freerider-banner" class="freerider-banner hidden"></div>
 
+    <div class="card cityscape-card">
+      <div class="cityscape-head">
+        <h3>Your nation</h3>
+        <span id="city-status" class="city-status">—</span>
+      </div>
+      <div class="cityscape">
+        <svg id="city-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop id="skyTop" offset="0" stop-color="#1b2a4a"/>
+              <stop id="skyBot" offset="1" stop-color="#41506b"/>
+            </linearGradient>
+          </defs>
+
+          <rect id="sky" x="0" y="0" width="800" height="300" fill="url(#skyGrad)"/>
+          <circle id="sun" cx="705" cy="70" r="32" fill="#ffd76a"/>
+
+          <!-- grass -->
+          <rect id="ground" x="0" y="252" width="800" height="48" fill="#3a5a40"/>
+
+          <!-- road -->
+          <rect x="0" y="262" width="800" height="30" fill="#2b2f3a"/>
+          <line x1="0" y1="277" x2="800" y2="277" stroke="#ffd76a" stroke-width="2" stroke-dasharray="22 18" opacity="0.7"/>
+
+          <g id="cars">
+            <g class="car" style="--lane:268; --dur:7s; --delay:0s"><rect width="34" height="13" rx="4" fill="#e6584d"/><circle cx="8" cy="14" r="3.5" fill="#111"/><circle cx="26" cy="14" r="3.5" fill="#111"/></g>
+            <g class="car" style="--lane:283; --dur:9s; --delay:-3s; --dir:-1"><rect width="34" height="13" rx="4" fill="#5aa6e6"/><circle cx="8" cy="14" r="3.5" fill="#111"/><circle cx="26" cy="14" r="3.5" fill="#111"/></g>
+            <g class="car" style="--lane:268; --dur:6s; --delay:-4s"><rect width="34" height="13" rx="4" fill="#7ed08a"/><circle cx="8" cy="14" r="3.5" fill="#111"/><circle cx="26" cy="14" r="3.5" fill="#111"/></g>
+            <g class="car" style="--lane:283; --dur:10s; --delay:-7s; --dir:-1"><rect width="34" height="13" rx="4" fill="#f0c24a"/><circle cx="8" cy="14" r="3.5" fill="#111"/><circle cx="26" cy="14" r="3.5" fill="#111"/></g>
+            <g class="car" style="--lane:268; --dur:8s; --delay:-2s"><rect width="34" height="13" rx="4" fill="#c79be0"/><circle cx="8" cy="14" r="3.5" fill="#111"/><circle cx="26" cy="14" r="3.5" fill="#111"/></g>
+          </g>
+
+          <!-- residential skyline (revealed as Prosperity rises) -->
+          <g id="city-residential">
+            <g class="grow" data-threshold="8">
+              <rect x="18" y="150" width="44" height="102" fill="#4b6b8a"/>
+              <rect class="window" x="26" y="162" width="10" height="12"/><rect class="window" x="44" y="162" width="10" height="12"/>
+              <rect class="window" x="26" y="186" width="10" height="12"/><rect class="window" x="44" y="186" width="10" height="12"/>
+            </g>
+            <g class="grow" data-threshold="30">
+              <rect x="66" y="176" width="38" height="76" fill="#56789a"/>
+              <rect class="window" x="73" y="188" width="9" height="11"/><rect class="window" x="89" y="188" width="9" height="11"/>
+            </g>
+            <g class="grow" data-threshold="55">
+              <rect x="110" y="132" width="48" height="120" fill="#3f5d7e"/>
+              <rect class="window" x="118" y="146" width="11" height="13"/><rect class="window" x="139" y="146" width="11" height="13"/>
+              <rect class="window" x="118" y="172" width="11" height="13"/><rect class="window" x="139" y="172" width="11" height="13"/>
+            </g>
+            <g class="grow" data-threshold="76">
+              <rect x="164" y="166" width="34" height="86" fill="#5a7ba0"/>
+              <rect class="window" x="171" y="178" width="9" height="11"/><rect class="window" x="184" y="178" width="9" height="11"/>
+            </g>
+            <g class="grow" data-threshold="92">
+              <rect x="202" y="188" width="28" height="64" fill="#4b6b8a"/>
+              <rect class="window" x="208" y="198" width="8" height="10"/>
+            </g>
+          </g>
+
+          <!-- infrastructure buildings (grow with their level) -->
+          <g class="building" id="b-education">
+            <rect x="240" y="184" width="80" height="68" fill="#c9a26b"/>
+            <polygon points="238,184 280,150 322,184" fill="#8a5a2b"/>
+            <line x1="280" y1="150" x2="280" y2="134" stroke="#cfd8e6" stroke-width="2"/><polygon points="280,135 295,140 280,145" fill="#e6584d"/>
+            <rect class="window" x="250" y="198" width="14" height="14"/><rect class="window" x="296" y="198" width="14" height="14"/>
+            <rect x="272" y="224" width="16" height="28" fill="#6b4423"/>
+            <text class="spark" id="spark-education" x="280" y="150">✨</text>
+          </g>
+
+          <g class="building" id="b-healthcare">
+            <rect x="334" y="186" width="78" height="66" fill="#eef2f7"/>
+            <rect x="366" y="194" width="14" height="6" fill="#e23b3b"/><rect x="370" y="190" width="6" height="14" fill="#e23b3b"/>
+            <rect class="window" x="344" y="212" width="12" height="13"/><rect class="window" x="390" y="212" width="12" height="13"/>
+            <rect x="366" y="228" width="16" height="24" fill="#b9c4d2"/>
+            <text class="spark" id="spark-healthcare" x="373" y="182">✨</text>
+          </g>
+
+          <g class="building" id="b-energy">
+            <polygon points="424,252 486,252 476,168 434,168" fill="#9fb0c4"/>
+            <polygon points="452,182 444,210 453,210 446,234 470,200 458,200 466,182" fill="#ffd76a"/>
+            <text class="spark" id="spark-energy" x="455" y="164">✨</text>
+          </g>
+
+          <!-- park between energy and industry -->
+          <g id="city-trees">
+            <g class="grow tree" data-threshold="20"><rect x="512" y="232" width="6" height="20" fill="#6b4423"/><polygon points="515,200 500,236 530,236" fill="#4e8a52"/></g>
+            <g class="grow tree" data-threshold="45"><rect x="548" y="236" width="6" height="16" fill="#6b4423"/><polygon points="551,210 538,238 564,238" fill="#5a9b5e"/></g>
+            <g class="grow tree" data-threshold="70"><rect x="582" y="234" width="6" height="18" fill="#6b4423"/><polygon points="585,206 570,238 600,238" fill="#4e8a52"/></g>
+            <g class="grow tree" data-threshold="10"><rect x="8" y="236" width="6" height="16" fill="#6b4423"/><polygon points="11,212 0,238 24,238" fill="#5a9b5e"/></g>
+          </g>
+
+          <g class="building" id="b-industry">
+            <rect x="600" y="202" width="162" height="50" fill="#7a8694"/>
+            <rect x="620" y="160" width="16" height="92" fill="#5b6571"/>
+            <rect x="650" y="148" width="16" height="104" fill="#5b6571"/>
+            <rect class="window" x="690" y="214" width="13" height="13"/><rect class="window" x="715" y="214" width="13" height="13"/><rect class="window" x="740" y="214" width="13" height="13"/>
+            <text class="spark" id="spark-industry" x="690" y="198">✨</text>
+          </g>
+
+          <!-- factory smoke -->
+          <g id="smoke">
+            <circle class="puff" style="--sx:628; --sy:160; --d:0s" r="9" fill="#c9cfd8"/>
+            <circle class="puff" style="--sx:628; --sy:160; --d:-2s" r="7" fill="#c9cfd8"/>
+            <circle class="puff" style="--sx:658; --sy:148; --d:-1s" r="10" fill="#c9cfd8"/>
+            <circle class="puff" style="--sx:658; --sy:148; --d:-3s" r="7" fill="#c9cfd8"/>
+          </g>
+
+          <!-- people on the sidewalk -->
+          <g id="city-people">
+            <g class="grow person" data-threshold="15"><circle cx="350" cy="250" r="4" fill="#ffd9b0"/><rect x="347" y="254" width="6" height="9" fill="#6aa0d0"/></g>
+            <g class="grow person" data-threshold="40"><circle cx="430" cy="250" r="4" fill="#ffd9b0"/><rect x="427" y="254" width="6" height="9" fill="#d07a6a"/></g>
+            <g class="grow person" data-threshold="60"><circle cx="150" cy="250" r="4" fill="#ffd9b0"/><rect x="147" y="254" width="6" height="9" fill="#7ed08a"/></g>
+            <g class="grow person" data-threshold="80"><circle cx="540" cy="250" r="4" fill="#ffd9b0"/><rect x="537" y="254" width="6" height="9" fill="#c79be0"/></g>
+          </g>
+
+          <!-- weather -->
+          <rect id="storm-overlay" x="0" y="0" width="800" height="300" fill="#0a0e18" opacity="0"/>
+          <g id="rain"></g>
+        </svg>
+      </div>
+    </div>
+
     <div class="game-grid">
       <!-- LEFT: you + action -->
       <div class="col col-action">

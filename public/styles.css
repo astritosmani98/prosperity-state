@@ -188,6 +188,70 @@ input:focus { outline: none; border-color: var(--gold); }
 .lr-bad { color: var(--red); }
 .lr-gold { color: var(--gold); }
 
+/* ---------- cityscape ---------- */
+.cityscape-card { padding: 12px 14px; }
+.cityscape-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cityscape-head h3 { margin: 0; }
+.city-status { font-size: .82rem; font-weight: 700; letter-spacing: .04em; padding: 3px 12px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); }
+.cityscape { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); line-height: 0; }
+#city-svg { width: 100%; height: clamp(150px, 26vh, 240px); display: block; }
+
+/* buildings rise from the ground; revealed elements grow up from their base */
+#city-svg .building,
+#city-svg .grow {
+  transform: scaleY(0);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform .9s cubic-bezier(.2,.8,.2,1);
+}
+
+/* lit windows when the grid is powered (Energy) */
+#city-svg .window { fill: #26344f; transition: fill .8s ease, opacity .8s ease; }
+#city-svg.powered .window { fill: #ffe08a; opacity: calc(.45 + .55 * var(--energy, 0)); }
+
+/* sun + sky transition smoothly */
+#sun { transition: cx .9s ease, cy .9s ease, r .9s ease, opacity .9s ease; }
+#skyTop, #skyBot { transition: stop-color .9s ease; }
+#storm-overlay { transition: opacity 1s ease; }
+
+/* upgrade flash + floating sparkle */
+#city-svg .flash { animation: bld-flash .8s ease; }
+@keyframes bld-flash { 0% { filter: brightness(2.2) drop-shadow(0 0 6px var(--gold)); } 100% { filter: brightness(1); } }
+#city-svg .spark { font-size: 22px; text-anchor: middle; opacity: 0; pointer-events: none; }
+#city-svg .spark.go { animation: spark-up 1s ease forwards; }
+@keyframes spark-up { 0% { opacity: 0; transform: translateY(6px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-16px); } }
+
+/* factory smoke */
+#smoke { transition: opacity .8s ease; }
+#city-svg .puff {
+  transform-box: fill-box; transform-origin: center;
+  animation: puff-rise 4s linear infinite; animation-delay: var(--d, 0s);
+  /* positioned via CSS transform from its --sx/--sy anchor */
+  translate: var(--sx) var(--sy);
+}
+@keyframes puff-rise {
+  0% { opacity: 0; transform: translateY(0) scale(.5); }
+  25% { opacity: .55; }
+  100% { opacity: 0; transform: translateY(-46px) scale(1.5); }
+}
+
+/* cars drive along the road */
+#city-svg .car {
+  transform-box: fill-box;
+  animation: car-drive var(--dur, 8s) linear infinite; animation-delay: var(--delay, 0s);
+  translate: 0 var(--lane);
+}
+@keyframes car-drive {
+  from { transform: translateX(-60px); }
+  to   { transform: translateX(840px); }
+}
+
+/* rain (storm / decline) */
+#rain { display: none; }
+#city-svg.storm #rain { display: block; }
+#city-svg .raindrop { stroke: #9fb6d8; stroke-width: 2; opacity: .5; animation: rain-fall .6s linear infinite; }
+@keyframes rain-fall { from { transform: translateY(-14px); } to { transform: translateY(300px); } }
+
 /* threshold / maintenance note */
 .threshold-note {
   background: rgba(245,196,81,.08); border: 1px solid var(--gold-deep);
