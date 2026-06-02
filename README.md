@@ -69,10 +69,13 @@ share. Refuse for too long and the nation collapses, and nobody wins.
 - Tax (flat / progressive) and welfare / expansion policies
 - Random negative events, mitigated by Healthcare
 - Win at Prosperity 100 → wealth ranking · collapse at Prosperity 0
-- **Living cityscape** — an SVG map of the nation that grows as you play: the
-  skyline rises, the sky brightens with Prosperity, Energy lights the windows,
-  Roads add traffic, Industry puffs smoke, upgrades sparkle, and a free-rider
-  decline brings a storm
+- **Living cityscape** (centre of the board) — an SVG map of the nation that
+  grows as you play: recognizable infrastructure appears and levels up
+  (school, hospital, solar panels + wind turbine, factory), village houses,
+  parks, people, cars, birds and a river fill in with Prosperity, a day/night
+  cycle tracks the nation's health (bright day → starry night), Energy lights
+  the windows and streetlamps, Industry puffs smoke, upgrades sparkle, and a
+  free-rider decline brings a storm
 
 All tuning constants live in [`server/constants.js`](server/constants.js).
 

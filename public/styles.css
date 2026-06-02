@@ -194,7 +194,7 @@ input:focus { outline: none; border-color: var(--gold); }
 .cityscape-head h3 { margin: 0; }
 .city-status { font-size: .82rem; font-weight: 700; letter-spacing: .04em; padding: 3px 12px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); }
 .cityscape { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); line-height: 0; }
-#city-svg { width: 100%; height: clamp(150px, 26vh, 240px); display: block; }
+#city-svg { width: 100%; height: clamp(200px, 34vh, 320px); display: block; }
 
 /* buildings rise from the ground; revealed elements grow up from their base */
 #city-svg .building,
@@ -250,7 +250,49 @@ input:focus { outline: none; border-color: var(--gold); }
 #rain { display: none; }
 #city-svg.storm #rain { display: block; }
 #city-svg .raindrop { stroke: #9fb6d8; stroke-width: 2; opacity: .5; animation: rain-fall .6s linear infinite; }
-@keyframes rain-fall { from { transform: translateY(-14px); } to { transform: translateY(300px); } }
+@keyframes rain-fall { from { transform: translateY(-14px); } to { transform: translateY(340px); } }
+
+/* infrastructure objects: pop in at level 1, with level-gated extra pieces */
+#city-svg .infra {
+  opacity: 0; transform: translateY(10px) scale(.82);
+  transform-box: fill-box; transform-origin: 50% 100%;
+  transition: opacity .6s ease, transform .7s cubic-bezier(.2,.9,.3,1.2);
+}
+#city-svg .infra.shown { opacity: 1; transform: none; }
+#city-svg .lvl-item {
+  opacity: 0; transform: scale(.4);
+  transform-box: fill-box; transform-origin: 50% 100%;
+  transition: opacity .5s ease, transform .55s cubic-bezier(.2,.9,.3,1.35);
+}
+#city-svg .infra.shown .lvl-item.on { opacity: 1; transform: none; }
+#city-svg .infra-label { fill: #e7eefb; font-size: 13px; font-weight: 700; text-anchor: middle; opacity: 0; transition: opacity .6s ease; paint-order: stroke; stroke: #0e1422; stroke-width: 3px; }
+#city-svg .lvl-badge { fill: var(--gold); font-size: 11px; font-weight: 800; text-anchor: middle; opacity: 0; transition: opacity .6s ease; paint-order: stroke; stroke: #0e1422; stroke-width: 3px; }
+#city-svg .infra.shown .infra-label, #city-svg .infra.shown .lvl-badge { opacity: 1; }
+#city-svg .helipad-h { fill: #fff; font-size: 11px; font-weight: 800; text-anchor: middle; }
+
+/* sun / moon / stars / clouds / birds with day-night fade */
+#sun, #moon, #stars, #clouds, #birds { transition: opacity 1s ease; }
+#sun { transition: opacity 1s ease, cx .9s ease, cy .9s ease, r .9s ease, fill .9s ease; }
+#city-svg #stars circle { animation: twinkle 3s ease-in-out infinite; }
+@keyframes twinkle { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+#city-svg .cloud {
+  transform-box: fill-box; translate: 0 var(--cy, 60px);
+  animation: cloud-drift var(--cdur, 50s) linear infinite; animation-delay: var(--cdelay, 0s);
+}
+@keyframes cloud-drift { from { transform: translateX(-160px); } to { transform: translateX(900px); } }
+#city-svg .bird {
+  transform-box: fill-box; translate: 0 var(--by, 90px);
+  animation: bird-fly var(--bdur, 20s) linear infinite; animation-delay: var(--bdelay, 0s);
+}
+@keyframes bird-fly { 0% { transform: translate(-90px,0); } 50% { transform: translate(420px,-14px); } 100% { transform: translate(900px,0); } }
+
+/* wind turbine spins; streetlights glow at night/with energy; river shimmers */
+#turbine { transform-box: view-box; transform-origin: 488px 178px; animation: spin 5s linear infinite; }
+@keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+#city-svg .lamp-bulb { transition: fill .8s ease, filter .8s ease; }
+#city-svg.night .lamp-bulb, #city-svg.powered .lamp-bulb { fill: #ffe08a; filter: drop-shadow(0 0 5px #ffd76a); }
+#city-svg .shimmer { animation: shimmer 4s ease-in-out infinite; }
+@keyframes shimmer { 0%,100% { opacity: .25; } 50% { opacity: .6; } }
 
 /* threshold / maintenance note */
 .threshold-note {

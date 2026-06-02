@@ -190,57 +190,70 @@ function setStop(id, color) { const el = $(id); if (el) el.setAttribute('stop-co
 function renderCity(s) {
   const svg = $('city-svg');
   if (!svg) return;
+  buildStars();
   const infra = s.infrastructure || {};
   const p = clampNum(s.prosperity, 0, 100);
-  const t = p / 100;
+  const declining =
+    (s.freeRiders && s.freeRiders.length > 0) ||
+    (s.lastRoundResult && s.lastRoundResult.deltaP < 0);
 
-  // Sky: gloomy dusk → bright day. Sun rises and warms.
-  setStop('skyTop', lerpColor('#16213c', '#5fa8e8', t));
-  setStop('skyBot', lerpColor('#3a2f3a', '#cfe8ff', t));
+  // Day/night: bright by day at high Prosperity; a decline forces a dark storm.
+  const t = declining ? Math.min(p / 100, 0.18) : p / 100;
+  const night = 1 - t;
+
+  // Sky + celestial bodies.
+  setStop('skyTop', lerpColor('#0d1430', '#5fa8e8', t));
+  setStop('skyBot', lerpColor('#2a2336', '#cfe8ff', t));
   const sun = $('sun');
-  sun.setAttribute('cy', String(lerp(98, 46, t)));
+  sun.setAttribute('cy', String(lerp(104, 52, t)));
   sun.setAttribute('fill', lerpColor('#c9763a', '#fff0a8', t));
+  sun.style.opacity = clampNum(t * 1.4 - 0.1, 0, 1).toFixed(2);
+  $('moon').style.opacity = clampNum(night * 1.3 - 0.15, 0, 1).toFixed(2);
+  $('stars').style.opacity = clampNum(night * 1.4 - 0.3, 0, 1).toFixed(2);
+  $('clouds').style.opacity = clampNum(t * 1.2 - 0.1, 0, 1).toFixed(2);
+  $('birds').style.opacity = (p >= 40 && !declining ? clampNum(t, 0, 1) : 0).toFixed(2);
+  svg.classList.toggle('night', night > 0.55);
 
-  // Infrastructure buildings rise with their level; flash + sparkle on upgrade.
+  // Infrastructure objects: appear at level ≥ 1, reveal level-gated pieces,
+  // show a level badge, and flash + sparkle on each upgrade.
   for (const cat of ['education', 'healthcare', 'energy', 'industry']) {
     const el = $('b-' + cat);
     if (!el) continue;
     const lvl = infra[cat] || 0;
-    const scale = lvl <= 0 ? 0 : 0.45 + 0.55 * ((lvl - 1) / 4);
-    el.style.transform = `scaleY(${scale.toFixed(3)})`;
-    if (cityPrev && (cityPrev[cat] || 0) < lvl) flashBuilding(el, cat);
+    el.classList.toggle('shown', lvl >= 1);
+    el.querySelectorAll('.lvl-item').forEach((it) => {
+      it.classList.toggle('on', lvl >= parseInt(it.dataset.min, 10));
+    });
+    const badge = $('badge-' + cat);
+    if (badge) badge.textContent = lvl >= 1 ? 'Lv ' + lvl : '';
+    if (cityPrev && (cityPrev[cat] || 0) < lvl && lvl >= 1) flashBuilding(el, cat);
   }
 
-  // Residential skyline, trees and people appear as Prosperity rises.
+  // Village houses, trees and people grow in as Prosperity rises.
   svg.querySelectorAll('.grow').forEach((el) => {
     const thr = parseFloat(el.dataset.threshold);
     el.style.transform = p >= thr ? 'scaleY(1)' : 'scaleY(0)';
   });
 
-  // Energy lights the windows.
+  // Energy lights the windows (and streetlights at night).
   const energy = infra.energy || 0;
   svg.classList.toggle('powered', energy > 0);
   svg.style.setProperty('--energy', (energy / 5).toFixed(2));
 
   // Industry smokes; Healthcare cleans the air a little.
   const industry = infra.industry || 0;
-  const smoke = $('smoke');
-  smoke.style.opacity = (industry > 0
+  $('smoke').style.opacity = (industry > 0
     ? clampNum(industry / 5, 0, 1) * (1 - 0.12 * (infra.healthcare || 0))
     : 0).toFixed(2);
 
   // Roads put cars on the street.
   const roads = infra.roads || 0;
   const cars = svg.querySelectorAll('#cars .car');
-  const showCars = Math.min(cars.length, 1 + roads);
-  cars.forEach((c, i) => { c.style.display = i < showCars ? '' : 'none'; });
+  cars.forEach((c, i) => { c.style.display = i < Math.min(cars.length, 1 + roads) ? '' : 'none'; });
 
-  // Decline (free-riders or a falling round) brings a storm.
-  const declining =
-    (s.freeRiders && s.freeRiders.length > 0) ||
-    (s.lastRoundResult && s.lastRoundResult.deltaP < 0);
+  // Decline brings a storm.
   svg.classList.toggle('storm', !!declining);
-  $('storm-overlay').setAttribute('opacity', declining ? '0.4' : '0');
+  $('storm-overlay').setAttribute('opacity', declining ? '0.42' : '0');
   if (declining) buildRain(svg);
 
   // Status chip.
@@ -254,6 +267,23 @@ function renderCity(s) {
   $('city-status').textContent = label;
 
   cityPrev = { ...infra };
+}
+
+let starsBuilt = false;
+function buildStars() {
+  if (starsBuilt) return;
+  const g = $('stars');
+  if (!g) return;
+  for (let i = 0; i < 24; i++) {
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', (Math.random() * 800).toFixed(1));
+    c.setAttribute('cy', (Math.random() * 150).toFixed(1));
+    c.setAttribute('r', (Math.random() * 1.3 + 0.6).toFixed(1));
+    c.setAttribute('fill', '#fff');
+    c.style.animationDelay = (-Math.random() * 3).toFixed(2) + 's';
+    g.appendChild(c);
+  }
+  starsBuilt = true;
 }
 
 function flashBuilding(el, cat) {
