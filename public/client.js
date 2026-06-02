@@ -201,16 +201,18 @@ function renderCity(s) {
   const t = declining ? Math.min(p / 100, 0.18) : p / 100;
   const night = 1 - t;
 
-  // Sky + celestial bodies.
-  setStop('skyTop', lerpColor('#0d1430', '#5fa8e8', t));
-  setStop('skyBot', lerpColor('#2a2336', '#cfe8ff', t));
-  const sun = $('sun');
-  sun.setAttribute('cy', String(lerp(104, 52, t)));
-  sun.setAttribute('fill', lerpColor('#c9763a', '#fff0a8', t));
-  sun.style.opacity = clampNum(t * 1.4 - 0.1, 0, 1).toFixed(2);
+  // Sky (soft 3-stop Ghibli gradient) + celestial bodies.
+  setStop('skyTop', lerpColor('#0d1430', '#79b7e6', t));
+  setStop('skyMid', lerpColor('#1f2740', '#bfe0ef', t));
+  setStop('skyBot', lerpColor('#2a2336', '#eef3e0', t));
+  const sunY = String(lerp(112, 60, t));
+  $('sun').setAttribute('cy', sunY);
+  $('sunGlowC').setAttribute('cy', sunY);
+  $('sun').setAttribute('fill', lerpColor('#e0915a', '#fff3c4', t));
+  $('sunwrap').style.opacity = clampNum(t * 1.5 - 0.15, 0, 1).toFixed(2);
   $('moon').style.opacity = clampNum(night * 1.3 - 0.15, 0, 1).toFixed(2);
   $('stars').style.opacity = clampNum(night * 1.4 - 0.3, 0, 1).toFixed(2);
-  $('clouds').style.opacity = clampNum(t * 1.2 - 0.1, 0, 1).toFixed(2);
+  $('clouds').style.opacity = clampNum(t * 1.3 - 0.15, 0, 1).toFixed(2);
   $('birds').style.opacity = (p >= 40 && !declining ? clampNum(t, 0, 1) : 0).toFixed(2);
   svg.classList.toggle('night', night > 0.55);
 
@@ -224,8 +226,6 @@ function renderCity(s) {
     el.querySelectorAll('.lvl-item').forEach((it) => {
       it.classList.toggle('on', lvl >= parseInt(it.dataset.min, 10));
     });
-    const badge = $('badge-' + cat);
-    if (badge) badge.textContent = lvl >= 1 ? 'Lv ' + lvl : '';
     if (cityPrev && (cityPrev[cat] || 0) < lvl && lvl >= 1) flashBuilding(el, cat);
   }
 
@@ -251,9 +251,10 @@ function renderCity(s) {
   const cars = svg.querySelectorAll('#cars .car');
   cars.forEach((c, i) => { c.style.display = i < Math.min(cars.length, 1 + roads) ? '' : 'none'; });
 
-  // Decline brings a storm.
+  // Decline brings a storm; deep night dims the meadow a touch.
+  const dim = declining ? 0.42 : (night > 0.6 ? (night - 0.6) * 0.7 : 0);
   svg.classList.toggle('storm', !!declining);
-  $('storm-overlay').setAttribute('opacity', declining ? '0.42' : '0');
+  $('storm-overlay').setAttribute('opacity', dim.toFixed(2));
   if (declining) buildRain(svg);
 
   // Status chip.

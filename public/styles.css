@@ -265,14 +265,10 @@ input:focus { outline: none; border-color: var(--gold); }
   transition: opacity .5s ease, transform .55s cubic-bezier(.2,.9,.3,1.35);
 }
 #city-svg .infra.shown .lvl-item.on { opacity: 1; transform: none; }
-#city-svg .infra-label { fill: #e7eefb; font-size: 13px; font-weight: 700; text-anchor: middle; opacity: 0; transition: opacity .6s ease; paint-order: stroke; stroke: #0e1422; stroke-width: 3px; }
-#city-svg .lvl-badge { fill: var(--gold); font-size: 11px; font-weight: 800; text-anchor: middle; opacity: 0; transition: opacity .6s ease; paint-order: stroke; stroke: #0e1422; stroke-width: 3px; }
-#city-svg .infra.shown .infra-label, #city-svg .infra.shown .lvl-badge { opacity: 1; }
-#city-svg .helipad-h { fill: #fff; font-size: 11px; font-weight: 800; text-anchor: middle; }
 
 /* sun / moon / stars / clouds / birds with day-night fade */
-#sun, #moon, #stars, #clouds, #birds { transition: opacity 1s ease; }
-#sun { transition: opacity 1s ease, cx .9s ease, cy .9s ease, r .9s ease, fill .9s ease; }
+#sunwrap, #moon, #stars, #clouds, #birds { transition: opacity 1.1s ease; }
+#sun, #sunGlowC { transition: cx .9s ease, cy .9s ease, fill .9s ease; }
 #city-svg #stars circle { animation: twinkle 3s ease-in-out infinite; }
 @keyframes twinkle { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
 #city-svg .cloud {
@@ -287,7 +283,7 @@ input:focus { outline: none; border-color: var(--gold); }
 @keyframes bird-fly { 0% { transform: translate(-90px,0); } 50% { transform: translate(420px,-14px); } 100% { transform: translate(900px,0); } }
 
 /* wind turbine spins; streetlights glow at night/with energy; river shimmers */
-#turbine { transform-box: view-box; transform-origin: 488px 178px; animation: spin 5s linear infinite; }
+#turbine { transform-box: view-box; transform-origin: 714px 194px; animation: spin 5s linear infinite; }
 @keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
 #city-svg .lamp-bulb { transition: fill .8s ease, filter .8s ease; }
 #city-svg.night .lamp-bulb, #city-svg.powered .lamp-bulb { fill: #ffe08a; filter: drop-shadow(0 0 5px #ffd76a); }
