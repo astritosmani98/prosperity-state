@@ -435,11 +435,14 @@ function renderLastRound(s) {
 function renderLog(s) {
   const log = $('log');
   log.innerHTML = '';
-  for (const entry of s.log) {
+  // Newest first, so the latest events sit at the top of the Chronicle.
+  for (let i = s.log.length - 1; i >= 0; i--) {
+    const entry = s.log[i];
     const d = document.createElement('div');
     d.textContent = `R${entry.round}: ${entry.text}`;
     log.appendChild(d);
   }
+  log.scrollTop = 0; // keep the scrollbar pinned to the top (latest events)
 }
 
 // ----------------------------------------------------------------------------

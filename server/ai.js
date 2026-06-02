@@ -118,12 +118,17 @@ export function decideContribution(state, bot) {
 
   // Pull their weight toward the maintenance minimum so the nation keeps building.
   // Builders & strategists always cover their share; opportunists do too, EXCEPT
-  // in the late game when their greed takes over; free-riders never (until collapse).
+  // in the late game when their greed takes over. Free-riders normally don't —
+  // but they snap out of it and pitch in the moment Prosperity actually falls
+  // (a missed minimum or a damaging event last round).
+  const prosperityFell = !!(state.lastRoundResult &&
+    (state.lastRoundResult.belowThreshold || state.lastRoundResult.deltaP < 0));
   const coversShare =
     P <= 15 ||
     bot.archetype === 'builder' ||
     bot.archetype === 'strategist' ||
-    (bot.archetype === 'opportunist' && !lateGame);
+    (bot.archetype === 'opportunist' && !lateGame) ||
+    (bot.archetype === 'freerider' && prosperityFell);
   if (coversShare) {
     amount = Math.max(amount, Math.min(income, fairShare));
   }
