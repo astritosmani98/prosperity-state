@@ -290,6 +290,12 @@ input:focus { outline: none; border-color: var(--gold); }
 #city-svg .shimmer { animation: shimmer 4s ease-in-out infinite; }
 @keyframes shimmer { 0%,100% { opacity: .25; } 50% { opacity: .6; } }
 
+/* kids hop about; a ball bounces between them */
+#city-svg .kid { transform-box: fill-box; transform-origin: 50% 100%; animation: kid-hop 1.05s ease-in-out infinite; animation-delay: var(--pd, 0s); }
+@keyframes kid-hop { 0%,100% { transform: translateY(0) scaleY(1); } 28% { transform: translateY(-6px) scaleY(1.06); } 58% { transform: translateY(0) scaleY(.95); } }
+#city-svg .ball { transform-box: fill-box; transform-origin: 50% 100%; animation: ball-bounce 1.05s ease-in-out infinite; }
+@keyframes ball-bounce { 0%,100% { transform: translateY(0) scaleX(1.05); } 50% { transform: translateY(-15px) scaleX(.95); } }
+
 /* threshold / maintenance note */
 .threshold-note {
   background: rgba(245,196,81,.08); border: 1px solid var(--gold-deep);

@@ -124,7 +124,7 @@
             <!-- Layout discipline: HORIZON≈168, town GROUND LINE = y268 (all
                  foreground buildings share this base). Depth via size: big
                  foreground town, small distant factory near the horizon. -->
-            <svg id="city-svg" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <svg id="city-svg" viewBox="0 0 800 360" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
               <defs>
                 <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop id="skyTop" offset="0" stop-color="#0d1430"/>
@@ -175,11 +175,12 @@
                 <g class="cloud" style="--cdur:70s; --cy:28; --cdelay:-44s; opacity:.7"><ellipse cx="0" cy="0" rx="28" ry="13" fill="#ffffff"/><ellipse cx="22" cy="5" rx="20" ry="10" fill="#ffffff"/></g>
               </g>
 
-              <!-- birds (fair weather) -->
+              <!-- birds (fly low enough to stay in frame) -->
               <g id="birds">
-                <g class="bird" style="--bdur:19s; --by:96; --bdelay:0s"><path d="M0,0 q6,-7 12,0 q6,-7 12,0" fill="none" stroke="#3a4658" stroke-width="2"/></g>
-                <g class="bird" style="--bdur:23s; --by:74; --bdelay:-7s"><path d="M0,0 q5,-6 10,0 q5,-6 10,0" fill="none" stroke="#3a4658" stroke-width="2"/></g>
-                <g class="bird" style="--bdur:21s; --by:118; --bdelay:-13s"><path d="M0,0 q5,-6 10,0 q5,-6 10,0" fill="none" stroke="#3a4658" stroke-width="2"/></g>
+                <g class="bird" style="--bdur:19s; --by:124; --bdelay:0s"><path d="M0,0 q6,-7 12,0 q6,-7 12,0" fill="none" stroke="#3a4658" stroke-width="2"/></g>
+                <g class="bird" style="--bdur:23s; --by:142; --bdelay:-7s"><path d="M0,0 q5,-6 10,0 q5,-6 10,0" fill="none" stroke="#3a4658" stroke-width="2"/></g>
+                <g class="bird" style="--bdur:21s; --by:132; --bdelay:-13s"><path d="M0,0 q5,-6 10,0 q5,-6 10,0" fill="none" stroke="#3a4658" stroke-width="2"/></g>
+                <g class="bird" style="--bdur:26s; --by:156; --bdelay:-18s"><path d="M0,0 q5,-6 10,0 q5,-6 10,0" fill="none" stroke="#3a4658" stroke-width="2"/></g>
               </g>
 
               <!-- ===== BACKGROUND ===== -->
@@ -189,29 +190,26 @@
               <!-- rolling mid hills -->
               <path d="M0,198 C150,162 270,206 410,184 C560,160 670,206 800,186 L800,360 L0,360 Z" fill="url(#hillMid)"/>
 
-              <!-- small hill that the distant factory sits on -->
-              <path d="M486,212 Q582,170 690,212 L690,250 L486,250 Z" fill="#8fb1a8"/>
-
-              <!-- distant factory (small, grounded on its hill) -->
+              <!-- distant factory, small and grounded on the mid hills -->
               <g class="infra" id="b-industry">
-                <g class="lvl-item" data-min="1"><rect x="560" y="184" width="30" height="20" fill="#93a0ad"/><rect x="565" y="170" width="6" height="15" fill="#7d8a98"/><rect x="558" y="181" width="34" height="4" fill="#7d8a98"/></g>
-                <g class="lvl-item" data-min="3"><rect x="594" y="190" width="20" height="14" fill="#93a0ad"/><rect x="598" y="179" width="5" height="12" fill="#7d8a98"/></g>
-                <text class="spark" id="spark-industry" x="572" y="164">✨</text>
+                <g class="lvl-item" data-min="1"><rect x="604" y="183" width="32" height="4" fill="#7d8a98"/><rect x="606" y="170" width="28" height="16" fill="#93a0ad"/><rect x="610" y="156" width="5" height="14" fill="#7d8a98"/></g>
+                <g class="lvl-item" data-min="3"><rect x="638" y="176" width="18" height="11" fill="#93a0ad"/><rect x="642" y="167" width="4" height="10" fill="#7d8a98"/></g>
+                <text class="spark" id="spark-industry" x="618" y="150">✨</text>
               </g>
               <g id="smoke">
-                <circle class="puff" style="--sx:568; --sy:168; --d:0s" r="5" fill="#cdd3db"/>
-                <circle class="puff" style="--sx:568; --sy:168; --d:-2s" r="4" fill="#cdd3db"/>
-                <circle class="puff" style="--sx:568; --sy:168; --d:-3.5s" r="6" fill="#cdd3db"/>
+                <circle class="puff" style="--sx:612; --sy:154; --d:0s" r="5" fill="#cdd3db"/>
+                <circle class="puff" style="--sx:612; --sy:154; --d:-2s" r="4" fill="#cdd3db"/>
+                <circle class="puff" style="--sx:612; --sy:154; --d:-3.5s" r="6" fill="#cdd3db"/>
               </g>
 
               <!-- ===== FOREGROUND GROUND ===== -->
               <!-- meadow -->
               <path d="M0,252 C160,234 320,262 470,248 C610,234 710,266 800,252 L800,360 L0,360 Z" fill="url(#meadowGrad)"/>
 
-              <!-- winding river: narrow at the hills, widening and flowing off the bottom edge -->
+              <!-- winding river: springs from the mountains, widening as it flows off the bottom edge -->
               <g id="river">
-                <path d="M232,196 C214,236 182,250 166,284 C154,312 142,336 134,360 L246,360 C240,336 252,312 264,284 C282,250 252,236 248,196 Z" fill="url(#riverGrad)"/>
-                <path class="shimmer" d="M236,206 C220,240 192,254 176,286 C164,312 154,334 148,356" fill="none" stroke="#eafaff" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+                <path d="M252,138 C246,168 232,188 220,212 C202,248 178,262 164,292 C152,318 142,338 136,360 L244,360 C250,338 258,318 264,292 C278,262 256,248 248,212 C238,188 262,168 258,138 Z" fill="url(#riverGrad)"/>
+                <path class="shimmer" d="M254,150 C242,184 224,202 210,230 C192,262 168,280 156,310 C148,330 142,346 138,358" fill="none" stroke="#eafaff" stroke-width="3" stroke-linecap="round" opacity=".5"/>
               </g>
 
               <!-- country lane (in front of the town, never crosses the river) -->
@@ -302,12 +300,13 @@
                 <text class="spark" id="spark-energy" x="694" y="224">✨</text>
               </g>
 
-              <!-- villagers on the lane -->
+              <!-- kids playing in the meadow (hop, with a bouncing ball) -->
               <g id="city-people">
-                <g class="grow person" data-threshold="18"><circle cx="372" cy="306" r="4" fill="#ffd9b0"/><rect x="369" y="310" width="6" height="10" rx="2" fill="#6aa0d0"/></g>
-                <g class="grow person" data-threshold="40"><circle cx="470" cy="304" r="4" fill="#ffd9b0"/><rect x="467" y="308" width="6" height="10" rx="2" fill="#d07a6a"/></g>
-                <g class="grow person" data-threshold="60"><circle cx="556" cy="305" r="4" fill="#ffd9b0"/><rect x="553" y="309" width="6" height="10" rx="2" fill="#7ed08a"/></g>
-                <g class="grow person" data-threshold="82"><circle cx="648" cy="305" r="4" fill="#ffd9b0"/><rect x="645" y="309" width="6" height="10" rx="2" fill="#c79be0"/></g>
+                <g class="grow" data-threshold="14"><g class="kid" style="--pd:0s"><circle cx="372" cy="291" r="3.6" fill="#ffd9b0"/><rect x="369.4" y="294" width="5.2" height="8" rx="2.4" fill="#6aa0d0"/></g></g>
+                <g class="grow" data-threshold="14"><circle class="ball" cx="392" cy="300" r="3.6" fill="#e7c46b"/></g>
+                <g class="grow" data-threshold="14"><g class="kid" style="--pd:-0.55s"><circle cx="410" cy="290" r="3.6" fill="#ffd9b0"/><rect x="407.4" y="293" width="5.2" height="8" rx="2.4" fill="#d07a6a"/></g></g>
+                <g class="grow" data-threshold="40"><g class="kid" style="--pd:-0.3s"><circle cx="552" cy="291" r="3.6" fill="#ffd9b0"/><rect x="549.4" y="294" width="5.2" height="8" rx="2.4" fill="#7ed08a"/></g></g>
+                <g class="grow" data-threshold="64"><g class="kid" style="--pd:-0.85s"><circle cx="648" cy="291" r="3.6" fill="#ffd9b0"/><rect x="645.4" y="294" width="5.2" height="8" rx="2.4" fill="#c79be0"/></g></g>
               </g>
 
               <!-- weather -->
