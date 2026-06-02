@@ -208,12 +208,24 @@
 
               <!-- winding river: springs from the mountains, widening as it flows off the bottom edge -->
               <g id="river">
-                <path d="M250,182 C242,204 230,218 220,238 C202,264 178,272 164,296 C152,320 142,340 136,360 L244,360 C250,340 258,320 264,296 C278,272 258,264 248,238 C238,218 258,204 256,182 Z" fill="url(#riverGrad)"/>
-                <path class="shimmer" d="M252,192 C240,214 226,230 214,252 C196,276 172,284 158,308 C150,328 144,344 140,358" fill="none" stroke="#eafaff" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+                <path d="M250,200 C242,218 232,228 222,244 C204,268 180,276 166,298 C154,322 144,341 138,360 L244,360 C250,341 258,322 266,298 C280,276 260,268 250,244 C240,228 258,218 256,200 Z" fill="url(#riverGrad)"/>
+                <path class="shimmer" d="M252,210 C240,228 228,240 216,256 C198,278 174,286 160,308 C152,328 146,344 142,358" fill="none" stroke="#eafaff" stroke-width="3" stroke-linecap="round" opacity=".5"/>
               </g>
 
-              <!-- country lane (in front of the town, never crosses the river) -->
-              <path d="M300,318 C460,306 620,308 800,316" stroke="#c7a877" stroke-width="18" fill="none" stroke-linecap="round" opacity=".95"/>
+              <!-- country lane spanning the whole valley -->
+              <path d="M0,317 C200,321 600,313 800,317" stroke="#c7a877" stroke-width="14" fill="none" stroke-linecap="round" opacity=".95"/>
+              <!-- little wooden bridge where the lane crosses the river -->
+              <g id="bridge">
+                <rect x="176" y="316" width="5" height="28" fill="#7a5230"/>
+                <rect x="238" y="316" width="5" height="28" fill="#7a5230"/>
+                <rect x="148" y="309" width="124" height="15" rx="2" fill="#a9763f"/>
+                <line x1="148" y1="316" x2="272" y2="316" stroke="#8a5e30" stroke-width="1"/>
+                <rect x="150" y="298" width="3" height="12" fill="#8a5e30"/>
+                <rect x="190" y="298" width="3" height="12" fill="#8a5e30"/>
+                <rect x="230" y="298" width="3" height="12" fill="#8a5e30"/>
+                <rect x="268" y="298" width="3" height="12" fill="#8a5e30"/>
+                <line x1="150" y1="300" x2="270" y2="300" stroke="#a9763f" stroke-width="3"/>
+              </g>
               <g id="cars">
                 <g class="car" style="--lane:310; --dur:10s; --delay:0s"><rect width="30" height="12" rx="5" fill="#e07a5f"/><rect x="6" y="-4" width="16" height="6" rx="3" fill="#f2b3a0"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
                 <g class="car" style="--lane:310; --dur:13s; --delay:-5s"><rect width="30" height="12" rx="5" fill="#6a9bc9"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
