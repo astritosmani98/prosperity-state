@@ -213,7 +213,7 @@ function renderCity(s) {
   $('moon').style.opacity = clampNum(night * 1.3 - 0.15, 0, 1).toFixed(2);
   $('stars').style.opacity = clampNum(night * 1.4 - 0.3, 0, 1).toFixed(2);
   $('clouds').style.opacity = clampNum(t * 1.3 - 0.15, 0, 1).toFixed(2);
-  $('birds').style.opacity = (!declining && p >= 12 ? clampNum(0.45 + t, 0, 1) : 0).toFixed(2);
+  $('birds').style.opacity = (!declining && p >= 6 ? clampNum(0.5 + t * 0.5, 0, 1) : 0).toFixed(2);
   svg.classList.toggle('night', night > 0.55);
 
   // Infrastructure objects: appear at level ≥ 1, reveal level-gated pieces,

@@ -227,7 +227,7 @@ input:focus { outline: none; border-color: var(--gold); }
   transform-box: fill-box; transform-origin: center;
   animation: puff-rise 4s linear infinite; animation-delay: var(--d, 0s);
   /* positioned via CSS transform from its --sx/--sy anchor */
-  translate: var(--sx) var(--sy);
+  translate: calc(var(--sx, 0) * 1px) calc(var(--sy, 0) * 1px);
 }
 @keyframes puff-rise {
   0% { opacity: 0; transform: translateY(0) scale(.5); }
@@ -239,7 +239,7 @@ input:focus { outline: none; border-color: var(--gold); }
 #city-svg .car {
   transform-box: fill-box;
   animation: car-drive var(--dur, 8s) linear infinite; animation-delay: var(--delay, 0s);
-  translate: 0 var(--lane);
+  translate: 0 calc(var(--lane, 310) * 1px);
 }
 @keyframes car-drive {
   from { transform: translateX(-60px); }
@@ -272,12 +272,12 @@ input:focus { outline: none; border-color: var(--gold); }
 #city-svg #stars circle { animation: twinkle 3s ease-in-out infinite; }
 @keyframes twinkle { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
 #city-svg .cloud {
-  transform-box: fill-box; translate: 0 var(--cy, 60px);
+  transform-box: fill-box; translate: 0 calc(var(--cy, 60) * 1px);
   animation: cloud-drift var(--cdur, 50s) linear infinite; animation-delay: var(--cdelay, 0s);
 }
 @keyframes cloud-drift { from { transform: translateX(-160px); } to { transform: translateX(900px); } }
 #city-svg .bird {
-  transform-box: fill-box; translate: 0 var(--by, 90px);
+  transform-box: fill-box; translate: 0 calc(var(--by, 90) * 1px);
   animation: bird-fly var(--bdur, 20s) linear infinite; animation-delay: var(--bdelay, 0s);
 }
 @keyframes bird-fly { 0% { transform: translate(-90px,0); } 50% { transform: translate(420px,-14px); } 100% { transform: translate(900px,0); } }
