@@ -34,7 +34,7 @@ export const CONFIG = {
   // income they've been contributing. Bots refuse to subsidize anyone who lets it
   // fall too low, so a persistent free-rider drags Prosperity down instead of up.
   COOP_EMA: 0.55,             // weight on prior reputation vs this round's behaviour
-  FREERIDER_THRESHOLD: 0.15,  // coop score below this = treated as a free-rider
+  FREERIDER_THRESHOLD: 0.25,  // contributing under ~25% of income = treated as a free-rider
   FREERIDER_GRACE_ROUNDS: 2,  // no detection until more than this many rounds resolved
 
   // --- Minimum collective contribution (maintenance) ---

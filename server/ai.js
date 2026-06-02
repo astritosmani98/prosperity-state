@@ -24,7 +24,9 @@ const BASE_FRACTION = {
   builder: 0.85,
   strategist: 0.55,
   opportunist: 0.5,
-  freerider: 0.2,
+  // Just above the free-rider line: gives the minimum needed to dodge punishment,
+  // then hoards the rest. (Punishment threshold is FREERIDER_THRESHOLD = 25%.)
+  freerider: 0.3,
 };
 
 // Endgame greed, per archetype. `start` = share of the goal where selfishness
