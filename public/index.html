@@ -121,7 +121,10 @@
             <span id="city-status" class="city-status">—</span>
           </div>
           <div class="cityscape">
-            <svg id="city-svg" viewBox="0 0 800 340" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <!-- Layout discipline: HORIZON≈168, town GROUND LINE = y268 (all
+                 foreground buildings share this base). Depth via size: big
+                 foreground town, small distant factory near the horizon. -->
+            <svg id="city-svg" viewBox="0 0 800 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
               <defs>
                 <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop id="skyTop" offset="0" stop-color="#0d1430"/>
@@ -132,45 +135,44 @@
                   <stop offset="0" stop-color="#fff6cf" stop-opacity="0.85"/>
                   <stop offset="1" stop-color="#fff6cf" stop-opacity="0"/>
                 </radialGradient>
-                <linearGradient id="riverGrad" x1="0" y1="0" x2="1" y2="1">
+                <linearGradient id="riverGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0" stop-color="#bfe6f3"/>
-                  <stop offset="1" stop-color="#5fa0cf"/>
+                  <stop offset="1" stop-color="#69a8d4"/>
                 </linearGradient>
                 <linearGradient id="hillFar" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#aecbc6"/><stop offset="1" stop-color="#92b3af"/>
+                  <stop offset="0" stop-color="#b3cdc7"/><stop offset="1" stop-color="#97b7b1"/>
                 </linearGradient>
                 <linearGradient id="hillMid" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#8cc676"/><stop offset="1" stop-color="#6aa658"/>
+                  <stop offset="0" stop-color="#8ec678"/><stop offset="1" stop-color="#6ba659"/>
                 </linearGradient>
                 <linearGradient id="meadowGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stop-color="#92cf76"/><stop offset="1" stop-color="#5d9c4d"/>
+                  <stop offset="0" stop-color="#86c46a"/><stop offset="1" stop-color="#538f43"/>
                 </linearGradient>
               </defs>
 
-              <rect id="sky" x="0" y="0" width="800" height="340" fill="url(#skyGrad)"/>
+              <rect id="sky" x="0" y="0" width="800" height="360" fill="url(#skyGrad)"/>
 
               <!-- stars (night) -->
               <g id="stars"></g>
 
               <!-- moon (night) -->
               <g id="moon" opacity="0">
-                <circle cx="120" cy="70" r="26" fill="#eef2f8"/>
-                <circle cx="112" cy="62" r="5" fill="#d6deea"/>
-                <circle cx="128" cy="78" r="4" fill="#d6deea"/>
-                <circle cx="130" cy="62" r="3" fill="#d6deea"/>
+                <circle cx="120" cy="66" r="25" fill="#eef2f8"/>
+                <circle cx="112" cy="58" r="5" fill="#d6deea"/>
+                <circle cx="128" cy="74" r="4" fill="#d6deea"/>
               </g>
 
               <!-- sun (day) with soft glow -->
               <g id="sunwrap">
-                <circle id="sunGlowC" cx="648" cy="80" r="78" fill="url(#sunGlow)"/>
-                <circle id="sun" cx="648" cy="80" r="38" fill="#fff3c4"/>
+                <circle id="sunGlowC" cx="648" cy="78" r="76" fill="url(#sunGlow)"/>
+                <circle id="sun" cx="648" cy="78" r="36" fill="#fff3c4"/>
               </g>
 
-              <!-- soft Ghibli clouds -->
+              <!-- soft clouds -->
               <g id="clouds">
-                <g class="cloud" style="--cdur:58s; --cy:54; opacity:.95"><ellipse cx="0" cy="0" rx="42" ry="20" fill="#ffffff"/><ellipse cx="34" cy="8" rx="32" ry="16" fill="#ffffff"/><ellipse cx="-32" cy="9" rx="28" ry="15" fill="#ffffff"/><ellipse cx="6" cy="-12" rx="24" ry="16" fill="#ffffff"/></g>
-                <g class="cloud" style="--cdur:80s; --cy:116; --cdelay:-26s; opacity:.8"><ellipse cx="0" cy="0" rx="34" ry="16" fill="#f4f8fd"/><ellipse cx="26" cy="6" rx="24" ry="12" fill="#f4f8fd"/><ellipse cx="-22" cy="6" rx="20" ry="11" fill="#f4f8fd"/></g>
-                <g class="cloud" style="--cdur:70s; --cy:30; --cdelay:-44s; opacity:.7"><ellipse cx="0" cy="0" rx="28" ry="13" fill="#ffffff"/><ellipse cx="22" cy="5" rx="20" ry="10" fill="#ffffff"/></g>
+                <g class="cloud" style="--cdur:58s; --cy:52; opacity:.95"><ellipse cx="0" cy="0" rx="42" ry="20" fill="#ffffff"/><ellipse cx="34" cy="8" rx="32" ry="16" fill="#ffffff"/><ellipse cx="-32" cy="9" rx="28" ry="15" fill="#ffffff"/><ellipse cx="6" cy="-12" rx="24" ry="16" fill="#ffffff"/></g>
+                <g class="cloud" style="--cdur:80s; --cy:112; --cdelay:-26s; opacity:.8"><ellipse cx="0" cy="0" rx="34" ry="16" fill="#f4f8fd"/><ellipse cx="26" cy="6" rx="24" ry="12" fill="#f4f8fd"/><ellipse cx="-22" cy="6" rx="20" ry="11" fill="#f4f8fd"/></g>
+                <g class="cloud" style="--cdur:70s; --cy:28; --cdelay:-44s; opacity:.7"><ellipse cx="0" cy="0" rx="28" ry="13" fill="#ffffff"/><ellipse cx="22" cy="5" rx="20" ry="10" fill="#ffffff"/></g>
               </g>
 
               <!-- birds (fair weather) -->
@@ -180,109 +182,136 @@
                 <g class="bird" style="--bdur:21s; --by:118; --bdelay:-13s"><path d="M0,0 q5,-6 10,0 q5,-6 10,0" fill="none" stroke="#3a4658" stroke-width="2"/></g>
               </g>
 
+              <!-- ===== BACKGROUND ===== -->
               <!-- far hazy mountains -->
-              <path d="M0,200 C90,150 170,150 250,188 C330,150 410,146 480,186 C560,148 650,150 720,188 C760,170 790,176 800,166 L800,260 L0,260 Z" fill="url(#hillFar)" opacity="0.92"/>
-
-              <!-- distant factory, tucked far away on the slopes -->
-              <g class="infra" id="b-industry">
-                <g class="lvl-item" data-min="1"><rect x="612" y="176" width="34" height="22" fill="#9aa6b2"/><rect x="617" y="160" width="7" height="18" fill="#828e9b"/><rect x="610" y="172" width="38" height="5" fill="#7c8896"/></g>
-                <g class="lvl-item" data-min="3"><rect x="648" y="182" width="24" height="16" fill="#9aa6b2"/><rect x="652" y="170" width="6" height="13" fill="#828e9b"/></g>
-                <text class="spark" id="spark-industry" x="626" y="154">✨</text>
-              </g>
-
-              <!-- factory smoke (small, distant) -->
-              <g id="smoke">
-                <circle class="puff" style="--sx:620; --sy:158; --d:0s" r="6" fill="#cdd3db"/>
-                <circle class="puff" style="--sx:620; --sy:158; --d:-2s" r="5" fill="#cdd3db"/>
-                <circle class="puff" style="--sx:620; --sy:158; --d:-3.5s" r="7" fill="#cdd3db"/>
-              </g>
+              <path d="M0,168 C100,122 185,126 262,160 C342,120 430,118 502,158 C582,118 662,124 732,160 C762,146 786,150 800,140 L800,210 L0,210 Z" fill="url(#hillFar)" opacity="0.85"/>
 
               <!-- rolling mid hills -->
-              <path d="M0,236 C150,196 260,250 410,224 C560,198 670,250 800,226 L800,340 L0,340 Z" fill="url(#hillMid)"/>
+              <path d="M0,198 C150,162 270,206 410,184 C560,160 670,206 800,186 L800,360 L0,360 Z" fill="url(#hillMid)"/>
 
-              <!-- foreground meadow -->
-              <path d="M0,270 C170,250 330,284 470,266 C610,250 710,286 800,270 L800,340 L0,340 Z" fill="url(#meadowGrad)"/>
+              <!-- small hill that the distant factory sits on -->
+              <path d="M486,212 Q582,170 690,212 L690,250 L486,250 Z" fill="#8fb1a8"/>
 
-              <!-- winding river -->
+              <!-- distant factory (small, grounded on its hill) -->
+              <g class="infra" id="b-industry">
+                <g class="lvl-item" data-min="1"><rect x="560" y="184" width="30" height="20" fill="#93a0ad"/><rect x="565" y="170" width="6" height="15" fill="#7d8a98"/><rect x="558" y="181" width="34" height="4" fill="#7d8a98"/></g>
+                <g class="lvl-item" data-min="3"><rect x="594" y="190" width="20" height="14" fill="#93a0ad"/><rect x="598" y="179" width="5" height="12" fill="#7d8a98"/></g>
+                <text class="spark" id="spark-industry" x="572" y="164">✨</text>
+              </g>
+              <g id="smoke">
+                <circle class="puff" style="--sx:568; --sy:168; --d:0s" r="5" fill="#cdd3db"/>
+                <circle class="puff" style="--sx:568; --sy:168; --d:-2s" r="4" fill="#cdd3db"/>
+                <circle class="puff" style="--sx:568; --sy:168; --d:-3.5s" r="6" fill="#cdd3db"/>
+              </g>
+
+              <!-- ===== FOREGROUND GROUND ===== -->
+              <!-- meadow -->
+              <path d="M0,252 C160,234 320,262 470,248 C610,234 710,266 800,252 L800,360 L0,360 Z" fill="url(#meadowGrad)"/>
+
+              <!-- winding river: narrow at the hills, widening and flowing off the bottom edge -->
               <g id="river">
-                <path d="M268,214 C236,254 168,268 138,304 C118,328 96,338 74,346" stroke="url(#riverGrad)" stroke-width="30" fill="none" stroke-linecap="round"/>
-                <path class="shimmer" d="M266,218 C236,254 174,268 146,302 C126,326 104,336 84,344" stroke="#eafaff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".5"/>
+                <path d="M232,196 C214,236 182,250 166,284 C154,312 142,336 134,360 L246,360 C240,336 252,312 264,284 C282,250 252,236 248,196 Z" fill="url(#riverGrad)"/>
+                <path class="shimmer" d="M236,206 C220,240 192,254 176,286 C164,312 154,334 148,356" fill="none" stroke="#eafaff" stroke-width="3" stroke-linecap="round" opacity=".5"/>
               </g>
 
-              <!-- country lane -->
-              <path d="M300,320 C470,308 640,310 800,318" stroke="#c7a877" stroke-width="20" fill="none" stroke-linecap="round" opacity=".95"/>
+              <!-- country lane (in front of the town, never crosses the river) -->
+              <path d="M300,318 C460,306 620,308 800,316" stroke="#c7a877" stroke-width="18" fill="none" stroke-linecap="round" opacity=".95"/>
               <g id="cars">
-                <g class="car" style="--lane:312; --dur:9s; --delay:0s"><rect width="30" height="12" rx="5" fill="#e07a5f"/><rect x="6" y="-4" width="16" height="6" rx="3" fill="#f2b3a0"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
-                <g class="car" style="--lane:312; --dur:12s; --delay:-5s"><rect width="30" height="12" rx="5" fill="#6a9bc9"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
-                <g class="car" style="--lane:312; --dur:10s; --delay:-8s"><rect width="30" height="12" rx="5" fill="#e7c46b"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
-                <g class="car" style="--lane:312; --dur:11s; --delay:-3s"><rect width="30" height="12" rx="5" fill="#8aab78"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
+                <g class="car" style="--lane:310; --dur:10s; --delay:0s"><rect width="30" height="12" rx="5" fill="#e07a5f"/><rect x="6" y="-4" width="16" height="6" rx="3" fill="#f2b3a0"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
+                <g class="car" style="--lane:310; --dur:13s; --delay:-5s"><rect width="30" height="12" rx="5" fill="#6a9bc9"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
+                <g class="car" style="--lane:310; --dur:11s; --delay:-8s"><rect width="30" height="12" rx="5" fill="#e7c46b"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
+                <g class="car" style="--lane:310; --dur:12s; --delay:-3s"><rect width="30" height="12" rx="5" fill="#8aab78"/><circle cx="8" cy="13" r="3" fill="#3a2a22"/><circle cx="23" cy="13" r="3" fill="#3a2a22"/></g>
               </g>
 
-              <!-- riverside trees (organic, layered) -->
+              <!-- trees, all grounded on the y=268 line, clear of buildings & river -->
               <g id="city-trees">
-                <g class="grow tree" data-threshold="10"><rect x="196" y="244" width="7" height="20" fill="#6e4a2c"/><circle cx="199" cy="234" r="16" fill="#4f9150"/><circle cx="189" cy="240" r="11" fill="#5aa05a"/><circle cx="209" cy="240" r="11" fill="#5aa05a"/></g>
-                <g class="grow tree" data-threshold="32"><rect x="244" y="250" width="6" height="16" fill="#6e4a2c"/><circle cx="247" cy="241" r="13" fill="#4f9150"/><circle cx="238" cy="246" r="9" fill="#5aa05a"/><circle cx="256" cy="246" r="9" fill="#5aa05a"/></g>
-                <g class="grow tree" data-threshold="62"><rect x="150" y="252" width="6" height="16" fill="#6e4a2c"/><circle cx="153" cy="244" r="12" fill="#52975a"/><circle cx="144" cy="248" r="8" fill="#5aa05a"/></g>
-                <g class="grow tree" data-threshold="84"><rect x="556" y="250" width="6" height="16" fill="#6e4a2c"/><circle cx="559" cy="242" r="12" fill="#4f9150"/><circle cx="568" cy="247" r="8" fill="#5aa05a"/></g>
+                <g class="grow tree" data-threshold="8"><ellipse cx="110" cy="269" rx="19" ry="4" fill="#1d3a26" opacity=".2"/><rect x="106" y="246" width="7" height="23" fill="#6e4a2c"/><circle cx="110" cy="236" r="16" fill="#4f9150"/><circle cx="99" cy="242" r="10" fill="#5aa05a"/><circle cx="121" cy="242" r="10" fill="#5aa05a"/></g>
+                <g class="grow tree" data-threshold="32"><ellipse cx="150" cy="269" rx="13" ry="3" fill="#1d3a26" opacity=".18"/><rect x="147" y="252" width="6" height="17" fill="#6e4a2c"/><circle cx="150" cy="244" r="12" fill="#52975a"/><circle cx="141" cy="249" r="8" fill="#5aa05a"/></g>
+                <g class="grow tree" data-threshold="76"><ellipse cx="772" cy="269" rx="16" ry="4" fill="#1d3a26" opacity=".2"/><rect x="769" y="250" width="6" height="19" fill="#6e4a2c"/><circle cx="772" cy="242" r="13" fill="#4f9150"/><circle cx="781" cy="247" r="9" fill="#5aa05a"/></g>
               </g>
 
-              <!-- SCHOOL (cosy schoolhouse with a bell tower) -->
+              <!-- ===== TOWN (all bases on the y=268 ground line) ===== -->
+
+              <!-- a cottage across the river, on the left bank -->
+              <g class="grow house" data-threshold="58">
+                <ellipse cx="49" cy="269" rx="22" ry="4" fill="#1d3a26" opacity=".2"/>
+                <rect x="30" y="234" width="38" height="34" fill="#ece0c4"/><polygon points="26,234 49,214 72,234" fill="#7ba36a"/>
+                <rect class="window" x="37" y="242" width="9" height="9"/><rect x="52" y="252" width="9" height="16" rx="4" fill="#9c6b43"/>
+              </g>
+
+              <!-- SCHOOL -->
               <g class="infra" id="b-education">
-                <rect x="306" y="218" width="78" height="46" fill="#efe3c6"/>
-                <polygon points="302,218 345,190 388,218" fill="#c8714e"/>
-                <rect x="338" y="176" width="14" height="16" fill="#e6d3ac"/><polygon points="336,176 345,166 354,176" fill="#b35f3f"/><circle cx="345" cy="185" r="2.6" fill="#8a5630"/>
-                <circle cx="345" cy="205" r="5.5" fill="#fff"/><line x1="345" y1="205" x2="345" y2="201" stroke="#5a4632" stroke-width="1.2"/><line x1="345" y1="205" x2="348" y2="206" stroke="#5a4632" stroke-width="1.2"/>
-                <rect class="window" x="316" y="230" width="12" height="13"/><rect class="window" x="362" y="230" width="12" height="13"/>
-                <rect x="338" y="240" width="16" height="24" rx="7" fill="#9c6b43"/>
-                <text class="spark" id="spark-education" x="345" y="184">✨</text>
+                <ellipse cx="359" cy="269" rx="40" ry="5" fill="#1d3a26" opacity=".22"/>
+                <rect x="326" y="218" width="66" height="50" fill="#efe3c6"/>
+                <polygon points="320,218 359,192 398,218" fill="#c8714e"/>
+                <rect x="352" y="180" width="14" height="14" fill="#e6d3ac"/><polygon points="350,180 359,171 368,180" fill="#b35f3f"/><circle cx="359" cy="187" r="2.4" fill="#8a5630"/>
+                <circle cx="359" cy="206" r="5" fill="#fff"/><line x1="359" y1="206" x2="359" y2="202" stroke="#5a4632" stroke-width="1.2"/><line x1="359" y1="206" x2="362" y2="207" stroke="#5a4632" stroke-width="1.2"/>
+                <rect class="window" x="335" y="230" width="11" height="13"/><rect class="window" x="372" y="230" width="11" height="13"/>
+                <rect x="350" y="246" width="18" height="22" rx="8" fill="#9c6b43"/>
+                <text class="spark" id="spark-education" x="359" y="170">✨</text>
               </g>
 
-              <!-- COTTAGES (the village grows with Prosperity) -->
-              <g id="city-houses">
-                <g class="grow house" data-threshold="6"><rect x="404" y="234" width="30" height="30" fill="#f0e6cd"/><polygon points="400,234 419,216 438,234" fill="#c8714e"/><rect class="window" x="411" y="242" width="9" height="9"/><rect x="423" y="250" width="8" height="14" rx="4" fill="#9c6b43"/><rect x="424" y="214" width="5" height="9" fill="#a06a4a"/></g>
-                <g class="grow house" data-threshold="22"><rect x="442" y="240" width="26" height="24" fill="#ece0c4"/><polygon points="438,240 455,224 472,240" fill="#6a8caf"/><rect class="window" x="448" y="247" width="8" height="8"/></g>
-                <g class="grow house" data-threshold="42"><rect x="476" y="232" width="30" height="32" fill="#f0e6cd"/><polygon points="472,232 491,214 510,232" fill="#7ba36a"/><rect class="window" x="483" y="240" width="9" height="9"/><rect x="495" y="250" width="8" height="14" rx="4" fill="#9c6b43"/></g>
-                <g class="grow house" data-threshold="66"><rect x="514" y="240" width="24" height="24" fill="#ece0c4"/><polygon points="510,240 526,224 542,240" fill="#c8714e"/><rect class="window" x="520" y="247" width="8" height="8"/></g>
+              <!-- COTTAGE 1 -->
+              <g class="grow house" data-threshold="8">
+                <ellipse cx="423" cy="269" rx="22" ry="4" fill="#1d3a26" opacity=".2"/>
+                <rect x="404" y="234" width="38" height="34" fill="#f0e6cd"/><polygon points="400,234 423,214 446,234" fill="#c8714e"/>
+                <rect class="window" x="411" y="242" width="9" height="9"/><rect x="426" y="252" width="9" height="16" rx="4" fill="#9c6b43"/><rect x="427" y="214" width="5" height="9" fill="#a06a4a"/>
               </g>
 
-              <!-- CLINIC (cream walls, red cross) -->
+              <!-- CLINIC -->
               <g class="infra" id="b-healthcare">
-                <rect x="556" y="220" width="70" height="44" fill="#f5f1e7"/>
-                <polygon points="552,220 591,200 630,220" fill="#cf5a4f"/>
-                <rect x="584" y="230" width="13" height="5" fill="#d44a3f"/><rect x="588" y="226" width="5" height="13" fill="#d44a3f"/>
-                <rect class="window" x="564" y="240" width="11" height="12"/><rect class="window" x="606" y="240" width="11" height="12"/>
-                <rect x="584" y="244" width="14" height="20" rx="6" fill="#b7a98c"/>
-                <text class="spark" id="spark-healthcare" x="591" y="196">✨</text>
+                <ellipse cx="487" cy="269" rx="40" ry="5" fill="#1d3a26" opacity=".22"/>
+                <rect x="454" y="220" width="66" height="48" fill="#f5f1e7"/>
+                <polygon points="448,220 487,200 526,220" fill="#cf5a4f"/>
+                <rect x="480" y="230" width="14" height="5" fill="#d44a3f"/><rect x="484" y="226" width="5" height="13" fill="#d44a3f"/>
+                <rect class="window" x="462" y="240" width="11" height="12"/><rect class="window" x="501" y="240" width="11" height="12"/>
+                <rect x="480" y="248" width="14" height="20" rx="6" fill="#b7a98c"/>
+                <text class="spark" id="spark-healthcare" x="487" y="190">✨</text>
               </g>
 
-              <!-- SOLAR & WIND (clean energy on the meadow) -->
+              <!-- COTTAGE 2 -->
+              <g class="grow house" data-threshold="24">
+                <ellipse cx="551" cy="269" rx="22" ry="4" fill="#1d3a26" opacity=".2"/>
+                <rect x="532" y="234" width="38" height="34" fill="#ece0c4"/><polygon points="528,234 551,214 574,234" fill="#6a8caf"/>
+                <rect class="window" x="539" y="242" width="9" height="9"/><rect x="554" y="252" width="9" height="16" rx="4" fill="#9c6b43"/>
+              </g>
+
+              <!-- COTTAGE 3 -->
+              <g class="grow house" data-threshold="44">
+                <ellipse cx="601" cy="269" rx="22" ry="4" fill="#1d3a26" opacity=".2"/>
+                <rect x="582" y="238" width="34" height="30" fill="#f0e6cd"/><polygon points="578,238 599,220 620,238" fill="#c8714e"/>
+                <rect class="window" x="588" y="245" width="8" height="8"/>
+              </g>
+
+              <!-- SOLAR & WIND -->
               <g class="infra" id="b-energy">
-                <g class="lvl-item" data-min="1"><polygon points="642,262 666,262 660,246 636,246" fill="#274a78"/><line x1="639" y1="254" x2="663" y2="254" stroke="#6f9bd0" stroke-width="1"/><line x1="650" y1="246" x2="647" y2="262" stroke="#6f9bd0" stroke-width="1"/><rect x="652" y="262" width="3" height="6" fill="#6b5b45"/></g>
-                <g class="lvl-item" data-min="2"><polygon points="670,262 694,262 688,246 664,246" fill="#274a78"/><line x1="667" y1="254" x2="691" y2="254" stroke="#6f9bd0" stroke-width="1"/><rect x="680" y="262" width="3" height="6" fill="#6b5b45"/></g>
-                <g class="lvl-item" data-min="4"><polygon points="642,242 666,242 660,226 636,226" fill="#274a78"/><line x1="639" y1="234" x2="663" y2="234" stroke="#6f9bd0" stroke-width="1"/><rect x="652" y="242" width="3" height="6" fill="#6b5b45"/></g>
-                <g class="lvl-item" data-min="5"><polygon points="670,242 694,242 688,226 664,226" fill="#274a78"/><line x1="667" y1="234" x2="691" y2="234" stroke="#6f9bd0" stroke-width="1"/><rect x="680" y="242" width="3" height="6" fill="#6b5b45"/></g>
+                <ellipse cx="694" cy="269" rx="62" ry="5" fill="#1d3a26" opacity=".2"/>
+                <g class="lvl-item" data-min="1"><polygon points="640,267 664,267 658,252 634,252" fill="#274a78"/><line x1="637" y1="259" x2="661" y2="259" stroke="#6f9bd0" stroke-width="1"/><line x1="648" y1="252" x2="645" y2="267" stroke="#6f9bd0" stroke-width="1"/></g>
+                <g class="lvl-item" data-min="2"><polygon points="668,267 692,267 686,252 662,252" fill="#274a78"/><line x1="665" y1="259" x2="689" y2="259" stroke="#6f9bd0" stroke-width="1"/></g>
+                <g class="lvl-item" data-min="4"><polygon points="640,247 664,247 658,232 634,232" fill="#274a78"/><line x1="637" y1="239" x2="661" y2="239" stroke="#6f9bd0" stroke-width="1"/></g>
+                <g class="lvl-item" data-min="5"><polygon points="668,247 692,247 686,232 662,232" fill="#274a78"/><line x1="665" y1="239" x2="689" y2="239" stroke="#6f9bd0" stroke-width="1"/></g>
                 <g class="lvl-item" data-min="3">
-                  <rect x="712" y="192" width="5" height="72" fill="#dbe3ee"/>
+                  <rect x="730" y="200" width="5" height="68" fill="#dbe3ee"/>
                   <g id="turbine">
-                    <polygon points="714,194 710,156 718,156" fill="#eef3fa"/>
-                    <polygon points="714,194 680,210 684,215" fill="#eef3fa"/>
-                    <polygon points="714,194 748,210 744,215" fill="#eef3fa"/>
+                    <polygon points="732,202 728,166 736,166" fill="#eef3fa"/>
+                    <polygon points="732,202 700,218 704,223" fill="#eef3fa"/>
+                    <polygon points="732,202 764,218 760,223" fill="#eef3fa"/>
                   </g>
-                  <circle cx="714" cy="194" r="4" fill="#b6c2d2"/>
+                  <circle cx="732" cy="202" r="4" fill="#b6c2d2"/>
                 </g>
-                <text class="spark" id="spark-energy" x="680" y="220">✨</text>
+                <text class="spark" id="spark-energy" x="694" y="224">✨</text>
               </g>
 
               <!-- villagers on the lane -->
               <g id="city-people">
-                <g class="grow person" data-threshold="18"><circle cx="430" cy="300" r="4" fill="#ffd9b0"/><rect x="427" y="304" width="6" height="10" rx="2" fill="#6aa0d0"/></g>
-                <g class="grow person" data-threshold="40"><circle cx="512" cy="300" r="4" fill="#ffd9b0"/><rect x="509" y="304" width="6" height="10" rx="2" fill="#d07a6a"/></g>
-                <g class="grow person" data-threshold="60"><circle cx="372" cy="300" r="4" fill="#ffd9b0"/><rect x="369" y="304" width="6" height="10" rx="2" fill="#7ed08a"/></g>
-                <g class="grow person" data-threshold="82"><circle cx="592" cy="300" r="4" fill="#ffd9b0"/><rect x="589" y="304" width="6" height="10" rx="2" fill="#c79be0"/></g>
+                <g class="grow person" data-threshold="18"><circle cx="372" cy="306" r="4" fill="#ffd9b0"/><rect x="369" y="310" width="6" height="10" rx="2" fill="#6aa0d0"/></g>
+                <g class="grow person" data-threshold="40"><circle cx="470" cy="304" r="4" fill="#ffd9b0"/><rect x="467" y="308" width="6" height="10" rx="2" fill="#d07a6a"/></g>
+                <g class="grow person" data-threshold="60"><circle cx="556" cy="305" r="4" fill="#ffd9b0"/><rect x="553" y="309" width="6" height="10" rx="2" fill="#7ed08a"/></g>
+                <g class="grow person" data-threshold="82"><circle cx="648" cy="305" r="4" fill="#ffd9b0"/><rect x="645" y="309" width="6" height="10" rx="2" fill="#c79be0"/></g>
               </g>
 
               <!-- weather -->
-              <rect id="storm-overlay" x="0" y="0" width="800" height="340" fill="#0a0e18" opacity="0"/>
+              <rect id="storm-overlay" x="0" y="0" width="800" height="360" fill="#0a0e18" opacity="0"/>
               <g id="rain"></g>
             </svg>
           </div>

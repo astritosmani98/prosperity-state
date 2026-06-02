@@ -250,7 +250,7 @@ input:focus { outline: none; border-color: var(--gold); }
 #rain { display: none; }
 #city-svg.storm #rain { display: block; }
 #city-svg .raindrop { stroke: #9fb6d8; stroke-width: 2; opacity: .5; animation: rain-fall .6s linear infinite; }
-@keyframes rain-fall { from { transform: translateY(-14px); } to { transform: translateY(340px); } }
+@keyframes rain-fall { from { transform: translateY(-14px); } to { transform: translateY(360px); } }
 
 /* infrastructure objects: pop in at level 1, with level-gated extra pieces */
 #city-svg .infra {
@@ -283,7 +283,7 @@ input:focus { outline: none; border-color: var(--gold); }
 @keyframes bird-fly { 0% { transform: translate(-90px,0); } 50% { transform: translate(420px,-14px); } 100% { transform: translate(900px,0); } }
 
 /* wind turbine spins; streetlights glow at night/with energy; river shimmers */
-#turbine { transform-box: view-box; transform-origin: 714px 194px; animation: spin 5s linear infinite; }
+#turbine { transform-box: view-box; transform-origin: 732px 202px; animation: spin 5s linear infinite; }
 @keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
 #city-svg .lamp-bulb { transition: fill .8s ease, filter .8s ease; }
 #city-svg.night .lamp-bulb, #city-svg.powered .lamp-bulb { fill: #ffe08a; filter: drop-shadow(0 0 5px #ffd76a); }
