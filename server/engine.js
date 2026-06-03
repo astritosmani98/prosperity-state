@@ -355,6 +355,15 @@ export function resolveRound(state, rng = Math.random) {
     upgrades,
     bankrupted,
     freeRiders: detectFreeRiders(state),
+    // Per-player snapshot AFTER this round resolves (wealth/influence trajectory).
+    players: living.map((p) => ({
+      id: p.id, name: p.name, archetype: p.archetype, isBot: p.isBot,
+      contribution: contributions[p.id], income: p.income,
+      coins: p.coins, influence: p.influence, alive: p.alive, bankrupt: p.bankrupt,
+    })),
+    infrastructure: { ...state.infrastructure },
+    taxPolicy: state.taxPolicy,
+    welfarePolicy: state.welfarePolicy,
   };
   state.lastRoundResult = result;
   state.roundHistory.push(result);

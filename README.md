@@ -30,8 +30,11 @@ process.
 
 Every **finished** game (won or collapsed) can be saved to a Postgres database —
 a summary row plus the full round-by-round history — so you can analyse the data
-later. This is entirely optional: with no database configured the game runs
-exactly the same and nothing is stored.
+later. Each round also stores a **per-player snapshot** (coins, income,
+influence, contribution, alive/bankrupt) and the infrastructure/policy state, so
+you can reconstruct every citizen's wealth and influence trajectory. This is
+entirely optional: with no database configured the game runs exactly the same
+and nothing is stored.
 
 **Setup (free, ~5 min) with [Neon](https://neon.tech):**
 1. Create a free Neon project and copy its **connection string** (it ends with

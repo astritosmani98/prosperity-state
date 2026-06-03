@@ -58,8 +58,18 @@ CREATE TABLE IF NOT EXISTS game_rounds (
   top_contributors  JSONB,
   upgrades          JSONB,
   bankrupted        JSONB,
-  free_riders       JSONB
+  free_riders       JSONB,
+  players           JSONB,                  -- per-player snapshot this round
+  infrastructure    JSONB,                  -- infra levels at this round
+  tax_policy        TEXT,
+  welfare_policy    TEXT
 );
+
+-- Migrate older databases that predate the per-round detail columns.
+ALTER TABLE game_rounds ADD COLUMN IF NOT EXISTS players        JSONB;
+ALTER TABLE game_rounds ADD COLUMN IF NOT EXISTS infrastructure JSONB;
+ALTER TABLE game_rounds ADD COLUMN IF NOT EXISTS tax_policy     TEXT;
+ALTER TABLE game_rounds ADD COLUMN IF NOT EXISTS welfare_policy TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_games_created  ON games(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_games_outcome  ON games(outcome);
@@ -134,14 +144,17 @@ export async function recordGame(state, roomCode) {
         `INSERT INTO game_rounds
           (game_id, round, pool, threshold, below_threshold, neglect, delta_p, k,
            prosperity_before, prosperity_after, focus, event, contributions,
-           top_contributors, upgrades, bankrupted, free_riders)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`,
+           top_contributors, upgrades, bankrupted, free_riders,
+           players, infrastructure, tax_policy, welfare_policy)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`,
         [
           gameId, r.round, r.pool, r.threshold ?? null, !!r.belowThreshold, r.neglect ?? 0,
           r.deltaP, r.K ?? null, r.prosperityBefore, r.prosperityAfter, r.focus ?? null,
           JSON.stringify(r.event || null), JSON.stringify(r.contributions || []),
           JSON.stringify(r.topContributors || []), JSON.stringify(r.upgrades || []),
           JSON.stringify(r.bankrupted || []), JSON.stringify(r.freeRiders || []),
+          JSON.stringify(r.players || []), JSON.stringify(r.infrastructure || {}),
+          r.taxPolicy ?? null, r.welfarePolicy ?? null,
         ]
       );
     }
