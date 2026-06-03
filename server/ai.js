@@ -18,6 +18,16 @@ const PROTEST_LOYALTY = {
   opportunist: 0.8,
   freerider: 0.5,
   reciprocator: 1.0,
+  conformist: 1.0,
+  guardian: 1.4,   // reluctant to abandon the nation, but won't be exploited
+  egalitarian: 1.1,
+  philanthropist: 1.2,
+  sprinter: 0.8,
+  miser: 0.5,
+  politician: 1.0,
+  contrarian: 0.6,
+  investor: 1.1,
+  grudger: 0.4,    // punishes hardest
 };
 
 // Base contribution fraction of income, per archetype.
@@ -70,7 +80,36 @@ export function decideContribution(state, bot) {
 
   let fraction = BASE_FRACTION[bot.archetype] ?? 0.5;
 
-  // ===== Personas that fully govern their own giving (early return) =====
+  // Detect a persistent free-rider among the others.
+  const worstCoop = others.length ? Math.min(...others.map((p) => p.coopScore ?? 0.5)) : 1;
+  const freeRiderPresent =
+    state.round > CONFIG.FREERIDER_GRACE_ROUNDS && worstCoop < CONFIG.FREERIDER_THRESHOLD;
+
+  // The grudger never forgives a betrayal once it has seen one.
+  if (bot.archetype === 'grudger' && others.some((p) => (p.coopScore ?? 0.5) < CONFIG.FREERIDER_THRESHOLD)) {
+    bot.grudged = true;
+  }
+
+  // ===== Universal free-rider deterrence (applies to EVERY persona) =====
+  // When someone is persistently free-riding, every bot stops subsidizing them
+  // and pulls its giving down toward the offender's level — the round minimum is
+  // missed and Prosperity falls until the free-rider pays in again. This keeps
+  // free-riding reliably punished no matter which personas happen to be in play.
+  if (freeRiderPresent) {
+    const loyalty = PROTEST_LOYALTY[bot.archetype] ?? 1;
+    let frac = Math.min(BASE_FRACTION[bot.archetype] ?? 0.5, worstCoop * loyalty);
+    if (bot.archetype === 'freerider' && (prosperityFell || P <= 12)) frac = Math.max(frac, fairShareFrac);
+    return finalize(frac);
+  }
+
+  // ===== Grudger: once betrayed, defect for the rest of the game =====
+  if (bot.archetype === 'grudger' && bot.grudged) {
+    let frac = 0.12;
+    if (P <= 8) frac = Math.max(frac, 0.35); // minimal self-preservation
+    return finalize(frac);
+  }
+
+  // ===== No free-rider present: each persona expresses its personality =====
   switch (bot.archetype) {
     case 'reciprocator': {
       // Generous tit-for-tat: mirror last round's least-cooperative citizen.
@@ -140,34 +179,14 @@ export function decideContribution(state, bot) {
       return finalize(frac);
     }
     case 'grudger': {
-      // Grim trigger: cooperate until ANY free-rider appears, then defect for good.
-      if (others.some((p) => (p.coopScore ?? 0.5) < CONFIG.FREERIDER_THRESHOLD)) bot.grudged = true;
-      let frac = bot.grudged ? 0.12 : 0.7;
-      if (!bot.grudged && P <= 12) frac = Math.max(frac, fairShareFrac);
-      else if (bot.grudged && P <= 8) frac = Math.max(frac, 0.35); // minimal self-preservation
+      // Not (yet) betrayed → cooperate fully (the grudge state is handled above).
+      let frac = 0.7;
+      if (P <= 12) frac = Math.max(frac, fairShareFrac);
       return finalize(frac);
     }
   }
 
-  // ===== Conditional cooperation (builder / strategist / opportunist / freerider) =====
-  // If someone is persistently free-riding, these bots stop subsidizing them and
-  // pull their giving down to the offender's level, so the round minimum is missed
-  // and Prosperity falls until the free-rider starts paying in again.
-  const worstCoop = others.length ? Math.min(...others.map((p) => p.coopScore ?? 0.5)) : 1;
-  const freeRiderPresent =
-    state.round > CONFIG.FREERIDER_GRACE_ROUNDS && worstCoop < CONFIG.FREERIDER_THRESHOLD;
-
-  if (freeRiderPresent) {
-    const loyalty = PROTEST_LOYALTY[bot.archetype] ?? 1;
-    fraction = Math.min(fraction, worstCoop * loyalty);
-    if (bot.archetype === 'freerider' && (prosperityFell || P <= 12)) {
-      fraction = Math.max(fraction, fairShareFrac);
-    }
-    fraction += (Math.random() - 0.5) * 0.05;
-    return clamp(Math.round(income * clamp(fraction, 0, 1)), 0, income);
-  }
-
-  // ===== Normal cooperation (no free-rider) =====
+  // ===== Builder / strategist / opportunist / freerider — base logic =====
   if (P <= 15) fraction = Math.max(fraction, 0.7);
   if (P <= 8) fraction = Math.max(fraction, 0.9);
 
