@@ -6,8 +6,10 @@ national **Prosperity** reaches **100**, and at that moment only the **richest
 surviving citizen wins**.
 
 Play online from any device with a 4-letter room code. Empty seats are filled by
-AI citizens with distinct personalities (builders, strategists, opportunists,
-free-riders, and reciprocators), assigned at random each game.
+AI citizens with 15 distinct personalities — builder, strategist, opportunist,
+free-rider, reciprocator, conformist, guardian, egalitarian, philanthropist,
+sprinter, miser, politician, contrarian, investor and grudger — assigned at
+random each game, so every match plays differently.
 
 ## Quick start
 

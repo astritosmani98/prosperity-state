@@ -59,32 +59,100 @@ export function decideContribution(state, bot) {
   const fairShare = Math.ceil(roundThreshold(state) / Math.max(1, living.length));
   const fairShareFrac = clamp(fairShare / income, 0, 1);
 
+  // Shared signals used by the personas below.
+  const others = living.filter((p) => p.id !== bot.id);
+  const prosperityFell = !!(state.lastRoundResult &&
+    (state.lastRoundResult.belowThreshold || state.lastRoundResult.deltaP < 0));
+  const lastFrac = (p) => (p.lastContribution == null ? 0.6 : clamp(p.lastContribution / Math.max(1, income), 0, 1));
+  const avgCoins = living.reduce((s, p) => s + p.coins, 0) / Math.max(1, living.length);
+  const maxCoins = Math.max(...living.map((p) => p.coins));
+  const finalize = (frac) => clamp(Math.round(income * clamp(frac + (Math.random() - 0.5) * 0.06, 0, 1)), 0, income);
+
   let fraction = BASE_FRACTION[bot.archetype] ?? 0.5;
 
-  // ===== Reciprocator — generous tit-for-tat =====
-  // Mirrors LAST round's least-cooperative citizen: gives only a little after
-  // someone free-rode, then ramps its share back up as that citizen starts
-  // contributing again. Begins cooperatively and still helps avert a collapse.
-  if (bot.archetype === 'reciprocator') {
-    const others = living.filter((p) => p.id !== bot.id);
-    const lastFracs = others.map((p) =>
-      p.lastContribution == null ? 0.6 : clamp(p.lastContribution / Math.max(1, income), 0, 1)
-    );
-    const laggard = lastFracs.length ? Math.min(...lastFracs) : 0.6;
-    let frac = clamp(0.1 + laggard, 0, 1); // a little, plus mirror (slightly more generous than the laggard)
-    const fell = state.lastRoundResult && (state.lastRoundResult.belowThreshold || state.lastRoundResult.deltaP < 0);
-    if (fell || P <= 12) frac = Math.max(frac, fairShareFrac); // pitch in to reverse a decline
-    frac += (Math.random() - 0.5) * 0.05;
-    return clamp(Math.round(income * clamp(frac, 0, 1)), 0, income);
+  // ===== Personas that fully govern their own giving (early return) =====
+  switch (bot.archetype) {
+    case 'reciprocator': {
+      // Generous tit-for-tat: mirror last round's least-cooperative citizen.
+      const laggard = others.length ? Math.min(...others.map(lastFrac)) : 0.6;
+      let frac = clamp(0.1 + laggard, 0, 1);
+      if (prosperityFell || P <= 12) frac = Math.max(frac, fairShareFrac);
+      return finalize(frac);
+    }
+    case 'conformist': {
+      // Match the crowd: give the average of what everyone gave last round.
+      const fr = others.map(lastFrac);
+      let frac = fr.length ? fr.reduce((a, b) => a + b, 0) / fr.length : 0.6;
+      if (P <= 12) frac = Math.max(frac, fairShareFrac);
+      return finalize(frac);
+    }
+    case 'guardian': {
+      // Altruist: prevents collapse at the cost of its own ranking; never hoards.
+      let frac = 0.6;
+      if (P <= 45) frac = 0.85;
+      if (P <= 22) frac = 1.0;
+      if (prosperityFell) frac = Math.max(frac, 0.9);
+      return finalize(frac);
+    }
+    case 'egalitarian': {
+      // Keep wealth equal: give more when ahead, hold back when behind.
+      let frac = bot.coins > avgCoins ? 0.8 : (bot.coins < avgCoins ? 0.3 : 0.55);
+      if (P <= 12) frac = Math.max(frac, fairShareFrac);
+      return finalize(frac);
+    }
+    case 'philanthropist': {
+      // Competitive generosity: out-give last round's top giver to win the bonus.
+      const topLast = Math.max(0, ...others.map((p) => p.lastContribution || 0));
+      let frac = Math.max(0.6, Math.min(income, topLast + 2) / Math.max(1, income));
+      return finalize(frac);
+    }
+    case 'sprinter': {
+      // Coast early to build savings, then surge late to grab the bonus & finish it.
+      let frac = P < goal * 0.5 ? 0.25 : (P < goal * 0.8 ? 0.5 : 0.95);
+      if (P <= 12) frac = Math.max(frac, fairShareFrac);
+      return finalize(frac);
+    }
+    case 'miser': {
+      // Bare minimum to dodge free-rider punishment; hoard everything else.
+      let frac = CONFIG.FREERIDER_THRESHOLD + 0.04;
+      if (P <= 12) frac = Math.max(frac, fairShareFrac);
+      return finalize(frac);
+    }
+    case 'politician': {
+      // Chase Influence (especially right before a vote) to control policy.
+      let frac = 0.6;
+      if (state.round % CONFIG.VOTING_INTERVAL === 0) frac = 0.8; // a vote follows this round
+      const maxInf = Math.max(...living.map((p) => p.influence));
+      if (bot.influence < maxInf) frac = Math.max(frac, 0.75);
+      if (P <= 12) frac = Math.max(frac, fairShareFrac);
+      return finalize(frac);
+    }
+    case 'contrarian': {
+      // Resentful under-contributor (its real flavour is voting against the grain).
+      let frac = bot.coins < maxCoins ? 0.25 : 0.4;
+      if (prosperityFell || P <= 10) frac = Math.max(frac, fairShareFrac);
+      return finalize(frac);
+    }
+    case 'investor': {
+      // Build infrastructure multipliers early, reap (and bank) later.
+      let frac = P < goal * 0.6 ? 0.8 : 0.45;
+      if (P <= 12) frac = Math.max(frac, fairShareFrac);
+      return finalize(frac);
+    }
+    case 'grudger': {
+      // Grim trigger: cooperate until ANY free-rider appears, then defect for good.
+      if (others.some((p) => (p.coopScore ?? 0.5) < CONFIG.FREERIDER_THRESHOLD)) bot.grudged = true;
+      let frac = bot.grudged ? 0.12 : 0.7;
+      if (!bot.grudged && P <= 12) frac = Math.max(frac, fairShareFrac);
+      else if (bot.grudged && P <= 8) frac = Math.max(frac, 0.35); // minimal self-preservation
+      return finalize(frac);
+    }
   }
 
-  // ===== Conditional cooperation =====
-  // Look at the LEAST cooperative other citizen. If someone is persistently
-  // free-riding, cooperative bots refuse to keep subsidizing them: they pull
-  // their own giving down toward the offender's level, so the round minimum is
-  // missed and Prosperity falls — pressure that only lifts once the free-rider
-  // starts paying in (which raises their cooperation score back up).
-  const others = living.filter((p) => p.id !== bot.id);
+  // ===== Conditional cooperation (builder / strategist / opportunist / freerider) =====
+  // If someone is persistently free-riding, these bots stop subsidizing them and
+  // pull their giving down to the offender's level, so the round minimum is missed
+  // and Prosperity falls until the free-rider starts paying in again.
   const worstCoop = others.length ? Math.min(...others.map((p) => p.coopScore ?? 0.5)) : 1;
   const freeRiderPresent =
     state.round > CONFIG.FREERIDER_GRACE_ROUNDS && worstCoop < CONFIG.FREERIDER_THRESHOLD;
@@ -92,37 +160,26 @@ export function decideContribution(state, bot) {
   if (freeRiderPresent) {
     const loyalty = PROTEST_LOYALTY[bot.archetype] ?? 1;
     fraction = Math.min(fraction, worstCoop * loyalty);
-    // A free-rider bot only relents once the decline is actually hurting the nation.
-    if (bot.archetype === 'freerider') {
-      const last = state.lastRoundResult;
-      const hurting = last && (last.belowThreshold || last.deltaP < 0);
-      if (hurting || P <= 12) fraction = Math.max(fraction, fairShareFrac);
+    if (bot.archetype === 'freerider' && (prosperityFell || P <= 12)) {
+      fraction = Math.max(fraction, fairShareFrac);
     }
     fraction += (Math.random() - 0.5) * 0.05;
     return clamp(Math.round(income * clamp(fraction, 0, 1)), 0, income);
   }
 
   // ===== Normal cooperation (no free-rider) =====
-
-  // --- Collapse avoidance: if society is fragile, everyone chips in more. ---
   if (P <= 15) fraction = Math.max(fraction, 0.7);
   if (P <= 8) fraction = Math.max(fraction, 0.9);
 
-  // --- Opportunist: snipe the Top Contributor bonus when others hold back (early/mid only). ---
   if (bot.archetype === 'opportunist' && P < goal * 0.6) {
     const othersLikelyLow = living.length <= 3 || P < 30;
     if (othersLikelyLow) fraction = Math.max(fraction, 0.65);
   }
-
-  // --- Freerider: self-preserves near collapse, otherwise coasts. ---
   if (bot.archetype === 'freerider' && P > 25) {
     fraction = Math.min(fraction, 0.25);
   }
 
-  // --- Endgame selfishness: as the goal nears, self-interested archetypes keep
-  //     more of their income to climb the final wealth ranking. Builders never
-  //     hoard — they care about reaching 100. `start` = fraction of the goal at
-  //     which greed kicks in; `cut` = how hard contribution is throttled by P=100.
+  // Endgame selfishness: self-interested archetypes keep more as the goal nears.
   const eg = ENDGAME[bot.archetype] || { start: 0.8, cut: 0.6 };
   if (eg.cut > 0 && P >= goal * eg.start) {
     const span = goal - goal * eg.start || 1;
@@ -130,19 +187,11 @@ export function decideContribution(state, bot) {
     fraction *= 1 - eg.cut * nearness;
   }
 
-  // Add a little noise so bots don't move in lockstep.
   fraction += (Math.random() - 0.5) * 0.1;
   fraction = clamp(fraction, 0, 1);
-
   let amount = clamp(Math.round(income * fraction), 0, income);
 
-  // Pull their weight toward the maintenance minimum so the nation keeps building.
-  // Builders & strategists always cover their share; opportunists do too, EXCEPT
-  // in the late game when their greed takes over. Free-riders normally don't —
-  // but they snap out of it and pitch in the moment Prosperity actually falls
-  // (a missed minimum or a damaging event last round).
-  const prosperityFell = !!(state.lastRoundResult &&
-    (state.lastRoundResult.belowThreshold || state.lastRoundResult.deltaP < 0));
+  // Cover the maintenance minimum so the nation keeps building.
   const coversShare =
     P <= 15 ||
     bot.archetype === 'builder' ||
@@ -175,6 +224,19 @@ export function decideVote(state, bot) {
   // Rank 0 = richest. Used to judge whether redistribution helps or hurts me.
   const richerThanMe = living.filter((p) => p.coins > bot.coins).length;
   const inBottomHalf = richerThanMe >= living.length / 2;
+
+  // --- Persona-specific voting (overrides the wealth-based default) ---
+  if (bot.archetype === 'egalitarian' || bot.archetype === 'politician') {
+    // Pro-redistribution: tax the rich and fund welfare — the egalitarian on
+    // principle, the politician to court the (poorer) majority.
+    if (vote.type === 'taxPolicy') return pick('progressive', 'flat');
+    if (vote.type === 'welfarePolicy') return pick('welfare', 'expansion');
+  }
+  if (bot.archetype === 'contrarian') {
+    // Always push for change — vote against whatever policy is currently in force.
+    if (vote.type === 'taxPolicy') return pick(state.taxPolicy === 'progressive' ? 'flat' : 'progressive');
+    if (vote.type === 'welfarePolicy') return pick(state.welfarePolicy === 'welfare' ? 'expansion' : 'welfare');
+  }
 
   if (vote.type === 'taxPolicy') {
     // The progressive levy only taxes the single richest citizen. So the leader
