@@ -420,8 +420,8 @@ function renderLastRound(s) {
     lines.push(`<div class="lr-line">Citizens pooled <b class="lr-gold">${r.pool}</b> Coins <span class="muted">(min ${r.threshold})</span> → <b class="lr-good">+${r.deltaP}</b> Prosperity <span class="muted">(K=${r.K})</span></div>`);
     lines.push(`<div class="lr-line muted">Built toward: ${cap(r.focus)}</div>`);
   }
-  if (r.taxLevy > 0) lines.push(`<div class="lr-line">Progressive levy: ${r.taxPayer} paid <b>${r.taxLevy}</b></div>`);
-  if (r.welfareAmount > 0) lines.push(`<div class="lr-line">Welfare: <b>${r.welfareAmount}</b> Coins to ${r.welfareRecipient}</div>`);
+  if (r.taxLevy > 0 && r.taxPayers?.length) lines.push(`<div class="lr-line">Progressive levy: ${r.taxPayers.map(escapeHtml).join(', ')} paid <b>${r.taxLevy}</b> each</div>`);
+  if (r.welfareAmount > 0 && r.welfareRecipients?.length) lines.push(`<div class="lr-line">Welfare: <b>${r.welfareAmount}</b> Coins shared among ${r.welfareRecipients.map(escapeHtml).join(', ')}</div>`);
   if (r.topContributors.length) {
     const names = r.topContributors.map((t) => `${t.name} (+${t.refund})`).join(', ');
     lines.push(`<div class="lr-line lr-gold">⭐ Top contributor: ${names}</div>`);

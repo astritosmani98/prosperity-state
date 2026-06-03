@@ -208,16 +208,17 @@ export function resolveRound(state, rng = Math.random) {
     pool += c;
   }
 
-  // 2) Progressive tax levy (involuntary): richest alive pays a wealth %.
-  let taxLevy = 0;
-  let taxPayer = null;
+  // 2) Progressive tax levy (involuntary): the richest pay a wealth %.
+  //    Ties are taxed equally, so a perfectly equal society stays equal.
+  let taxLevy = 0;        // per-payer levy
+  let taxPayers = [];
   if (state.taxPolicy === 'progressive' && living.length > 0) {
-    const richest = living.reduce((a, b) => (b.coins > a.coins ? b : a));
-    taxLevy = Math.floor(richest.coins * CONFIG.PROGRESSIVE_TAX_RATE);
+    const maxCoins = Math.max(...living.map((p) => p.coins));
+    taxLevy = Math.floor(maxCoins * CONFIG.PROGRESSIVE_TAX_RATE);
     if (taxLevy > 0) {
-      richest.coins -= taxLevy;
-      pool += taxLevy;
-      taxPayer = richest.name;
+      for (const p of living) {
+        if (p.coins === maxCoins) { p.coins -= taxLevy; pool += taxLevy; taxPayers.push(p.name); }
+      }
     }
   }
 
@@ -303,12 +304,17 @@ export function resolveRound(state, rng = Math.random) {
     }
   }
 
-  // 8) Welfare payout — poorest living player receives the redirected funds.
-  let welfareRecipient = null;
+  // 8) Welfare payout — the poorest receive the redirected funds, split equally
+  //    among ties so a perfectly equal society shares it evenly.
+  let welfareRecipients = [];
   if (welfareAmount > 0 && living.length > 0) {
-    const poorest = living.reduce((a, b) => (b.coins < a.coins ? b : a));
-    poorest.coins += welfareAmount;
-    welfareRecipient = poorest.name;
+    const minCoins = Math.min(...living.map((p) => p.coins));
+    const poorest = living.filter((p) => p.coins === minCoins);
+    const share = Math.floor(welfareAmount / poorest.length);
+    if (share > 0) {
+      for (const p of poorest) p.coins += share;
+      welfareRecipients = poorest.map((p) => p.name);
+    }
   }
 
   // 9) Influence update.  I = max(1, floor(prev*0.8) + contribution).
@@ -346,9 +352,9 @@ export function resolveRound(state, rng = Math.random) {
     neglect,
     focus: state.infraFocus,
     taxLevy,
-    taxPayer,
+    taxPayers,
     welfareAmount,
-    welfareRecipient,
+    welfareRecipients,
     event,
     contributions: living.map((p) => ({ id: p.id, name: p.name, amount: contributions[p.id] })),
     topContributors,
