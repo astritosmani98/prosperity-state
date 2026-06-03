@@ -72,7 +72,9 @@ export async function initDb() {
     return;
   }
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    // Strip sslmode from the URL and enforce TLS via the explicit option instead
+    // (avoids a pg deprecation warning while keeping the required Neon encryption).
+    connectionString: process.env.DATABASE_URL.replace(/[?&]sslmode=[^&]*/i, ''),
     ssl: { rejectUnauthorized: false }, // Neon requires TLS
     max: 4,
     idleTimeoutMillis: 30_000,
