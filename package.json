@@ -8,12 +8,14 @@
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
     "test": "node server/engine.test.js",
-    "sim": "node server/sim.js"
+    "sim": "node server/sim.js",
+    "db:check": "node server/db-check.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
+    "pg": "^8.21.0",
     "ws": "^8.18.0"
   },
   "license": "MIT"

@@ -13,6 +13,7 @@ import {
   detectFreeRiders,
 } from './engine.js';
 import { decideContribution, decideVote } from './ai.js';
+import { recordGame } from './db.js';
 import { CONFIG, BOT_ARCHETYPES, BOT_NAMES } from './constants.js';
 
 // Pacing (ms). Overridable via env (PS_FAST=1 collapses delays for tests).
@@ -173,6 +174,7 @@ export class Room {
     this.broadcastState();
 
     if (this.state.phase === 'ended' || this.state.phase === 'collapsed') {
+      recordGame(this.state, this.code).catch(() => {}); // persist; never blocks the game
       this.scheduleCleanup();
       return;
     }

@@ -24,7 +24,34 @@ works on mobile web browsers (phones/tablets) as well as desktop.
 The server must be reachable by the other players. On the same LAN they can use
 your machine's IP (`http://<your-ip>:3000`). To play over the internet, deploy to
 any Node host (Render / Railway / Fly.io / a VPS) — it's a single `npm start`
-process with no database.
+process.
+
+## Game records (optional)
+
+Every **finished** game (won or collapsed) can be saved to a Postgres database —
+a summary row plus the full round-by-round history — so you can analyse the data
+later. This is entirely optional: with no database configured the game runs
+exactly the same and nothing is stored.
+
+**Setup (free, ~5 min) with [Neon](https://neon.tech):**
+1. Create a free Neon project and copy its **connection string** (it ends with
+   `?sslmode=require`).
+2. Locally: `cp .env.example .env` and paste it as `DATABASE_URL`.
+   When deployed: set `DATABASE_URL` as an environment variable in your host's
+   dashboard.
+3. Start the server — the `games` and `game_rounds` tables are created
+   automatically. Verify the connection any time with `npm run db:check`.
+
+**Reading the data:**
+- Browse/query/export directly in Neon's SQL editor (e.g.
+  `SELECT winner_archetype, count(*) FROM games WHERE outcome='ended' GROUP BY 1`).
+- Or use the built-in read-only JSON API:
+  - `GET /api/stats` — totals, outcome breakdown, avg rounds to win, wins by archetype
+  - `GET /api/games?limit=20` — recent games (summary)
+  - `GET /api/games/:id` — one game with its full round history
+
+Player names are stored as typed. If you'd prefer anonymised records, say so and
+the names can be dropped in favour of archetype + a random id.
 
 ## How a round works
 
@@ -89,7 +116,8 @@ server/
   engine.js      pure game logic — all formulas & the phase machine
   ai.js          bot decision-making (contributions + voting)
   rooms.js       lobby, sessions, timed simultaneous-turn orchestration
-  index.js       HTTP static server + WebSocket protocol
+  db.js          optional Postgres game records (summary + round history)
+  index.js       HTTP static server + WebSocket protocol + /api endpoints
   sim.js         headless all-bot simulation  (npm run sim [players])
   test-ws.js     end-to-end protocol test     (PS_FAST=1 npm start, then run)
 public/

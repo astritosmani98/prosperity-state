@@ -137,6 +137,8 @@ export function createGame(seats) {
     pendingVote: null,        // { type, prompt, options:[{id,label}], votes:{playerId:optionId} }
     lastRoundResult: null,
     lastVoteResult: null,
+    roundHistory: [],         // every resolved round result (for game records)
+    voteHistory: [],          // every resolved vote (for game records)
     log: [],
     winners: null,            // ranking array when ended
   };
@@ -355,6 +357,7 @@ export function resolveRound(state, rng = Math.random) {
     freeRiders: detectFreeRiders(state),
   };
   state.lastRoundResult = result;
+  state.roundHistory.push(result);
 
   // Narrative log.
   if (belowThreshold) {
@@ -476,6 +479,7 @@ export function resolveVote(state) {
 
   const winLabel = vote.options.find((o) => o.id === winner)?.label || winner;
   state.lastVoteResult = { type: vote.type, winner, winLabel, tally };
+  state.voteHistory.push({ round: state.round, type: vote.type, winner, winLabel });
   state.votesHeld += 1;
   state.pendingVote = null;
   state.phase = 'resolved';

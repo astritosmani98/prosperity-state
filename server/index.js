@@ -9,11 +9,15 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
 import { RoomManager } from './rooms.js';
+import { initDb, recentGames, gameDetail, stats } from './db.js';
 import { CONFIG } from './constants.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const PORT = process.env.PORT || 3000;
+
+// Load a local .env for development (no-op if the file or feature is absent).
+try { process.loadEnvFile(path.join(__dirname, '..', '.env')); } catch { /* none */ }
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -24,9 +28,36 @@ const MIME = {
   '.ico': 'image/x-icon',
 };
 
+// ---- Read-only JSON API for game records ------------------------------------
+function sendJson(res, code, obj) {
+  res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(obj));
+}
+
+async function handleApi(req, res, urlPath, query) {
+  try {
+    if (urlPath === '/api/stats') return sendJson(res, 200, await stats());
+    if (urlPath === '/api/games') {
+      const limit = parseInt(query.get('limit'), 10) || 20;
+      return sendJson(res, 200, await recentGames(limit));
+    }
+    const m = urlPath.match(/^\/api\/games\/(\d+)$/);
+    if (m) {
+      const game = await gameDetail(parseInt(m[1], 10));
+      return game ? sendJson(res, 200, game) : sendJson(res, 404, { error: 'not found' });
+    }
+    sendJson(res, 404, { error: 'unknown endpoint' });
+  } catch (e) {
+    sendJson(res, 500, { error: e.message });
+  }
+}
+
 // ---- Static file server -----------------------------------------------------
 const server = http.createServer((req, res) => {
-  let urlPath = decodeURIComponent((req.url || '/').split('?')[0]);
+  const parsed = new URL(req.url || '/', 'http://localhost');
+  let urlPath = decodeURIComponent(parsed.pathname);
+
+  if (urlPath.startsWith('/api/')) { handleApi(req, res, urlPath, parsed.searchParams); return; }
   if (urlPath === '/') urlPath = '/index.html';
 
   const filePath = path.normalize(path.join(PUBLIC_DIR, urlPath));
@@ -146,6 +177,8 @@ function handle(ws, msg) {
   }
 }
 
-server.listen(PORT, () => {
-  console.log(`\n  Prosperity State running → http://localhost:${PORT}\n`);
+server.listen(PORT, async () => {
+  console.log(`\n  Prosperity State running → http://localhost:${PORT}`);
+  await initDb();
+  console.log('');
 });
