@@ -17,6 +17,7 @@ const PROTEST_LOYALTY = {
   strategist: 1.1,
   opportunist: 0.8,
   freerider: 0.5,
+  reciprocator: 1.0,
 };
 
 // Base contribution fraction of income, per archetype.
@@ -27,6 +28,7 @@ const BASE_FRACTION = {
   // Just above the free-rider line: gives the minimum needed to dodge punishment,
   // then hoards the rest. (Punishment threshold is FREERIDER_THRESHOLD = 25%.)
   freerider: 0.3,
+  reciprocator: 0.55, // fallback only; its real giving is computed by mirroring (below)
 };
 
 // Endgame greed, per archetype. `start` = share of the goal where selfishness
@@ -38,6 +40,7 @@ const ENDGAME = {
   strategist:  { start: 0.75, cut: 0.8 },
   opportunist: { start: 0.6,  cut: 1.0 },
   freerider:   { start: 0.7,  cut: 1.0 },
+  reciprocator:{ start: 0.9,  cut: 0.3 }, // principled; only mildly tightens at the very end
 };
 
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
@@ -57,6 +60,23 @@ export function decideContribution(state, bot) {
   const fairShareFrac = clamp(fairShare / income, 0, 1);
 
   let fraction = BASE_FRACTION[bot.archetype] ?? 0.5;
+
+  // ===== Reciprocator — generous tit-for-tat =====
+  // Mirrors LAST round's least-cooperative citizen: gives only a little after
+  // someone free-rode, then ramps its share back up as that citizen starts
+  // contributing again. Begins cooperatively and still helps avert a collapse.
+  if (bot.archetype === 'reciprocator') {
+    const others = living.filter((p) => p.id !== bot.id);
+    const lastFracs = others.map((p) =>
+      p.lastContribution == null ? 0.6 : clamp(p.lastContribution / Math.max(1, income), 0, 1)
+    );
+    const laggard = lastFracs.length ? Math.min(...lastFracs) : 0.6;
+    let frac = clamp(0.1 + laggard, 0, 1); // a little, plus mirror (slightly more generous than the laggard)
+    const fell = state.lastRoundResult && (state.lastRoundResult.belowThreshold || state.lastRoundResult.deltaP < 0);
+    if (fell || P <= 12) frac = Math.max(frac, fairShareFrac); // pitch in to reverse a decline
+    frac += (Math.random() - 0.5) * 0.05;
+    return clamp(Math.round(income * clamp(frac, 0, 1)), 0, income);
+  }
 
   // ===== Conditional cooperation =====
   // Look at the LEAST cooperative other citizen. If someone is persistently

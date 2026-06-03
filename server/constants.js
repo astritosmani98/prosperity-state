@@ -75,7 +75,7 @@ export const CONFIG = {
 };
 
 // Bot personality archetypes (section 6: emergent roles).
-export const BOT_ARCHETYPES = ['builder', 'strategist', 'opportunist', 'freerider'];
+export const BOT_ARCHETYPES = ['builder', 'strategist', 'opportunist', 'freerider', 'reciprocator'];
 
 // Friendly names pool for bots.
 export const BOT_NAMES = [

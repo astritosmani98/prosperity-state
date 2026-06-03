@@ -7,7 +7,7 @@ surviving citizen wins**.
 
 Play online from any device with a 4-letter room code. Empty seats are filled by
 AI citizens with distinct personalities (builders, strategists, opportunists,
-free-riders).
+free-riders, and reciprocators), assigned at random each game.
 
 ## Quick start
 

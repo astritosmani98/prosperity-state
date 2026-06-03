@@ -99,16 +99,19 @@ export class Room {
     const total = Math.max(this.targetPlayers, humans.length);
     const botCount = Math.max(0, total - humans.length);
 
+    // Random personas + names each game (shuffled decks → varied but random).
+    const archDeck = shuffle(BOT_ARCHETYPES);
+    const nameDeck = shuffle(BOT_NAMES);
     const usedNames = new Set(humans.map((p) => p.name));
     let nameIdx = 0;
     for (let i = 0; i < botCount; i++) {
       const id = genId();
       let name;
-      do { name = BOT_NAMES[nameIdx++ % BOT_NAMES.length]; } while (usedNames.has(name) && nameIdx < 100);
+      do { name = nameDeck[nameIdx++ % nameDeck.length]; } while (usedNames.has(name) && nameIdx < 100);
       usedNames.add(name);
       this.players.set(id, {
         id, name, isBot: true, ws: null, connected: false,
-        token: null, archetype: BOT_ARCHETYPES[i % BOT_ARCHETYPES.length],
+        token: null, archetype: archDeck[i % archDeck.length],
       });
     }
 
@@ -371,6 +374,15 @@ export class Room {
       }
     }, delay);
   }
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function randDelay() {
