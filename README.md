@@ -45,13 +45,22 @@ and nothing is stored.
 3. Start the server — the `games` and `game_rounds` tables are created
    automatically. Verify the connection any time with `npm run db:check`.
 
+Three tables are created automatically: **`games`** (one summary row per game),
+**`game_players`** (one row per player per game — `name` and `is_bot` as real
+columns, plus archetype and final standing), and **`game_rounds`** (one row per
+round, with the per-player snapshot).
+
 **Reading the data:**
-- Browse/query/export directly in Neon's SQL editor (e.g.
-  `SELECT winner_archetype, count(*) FROM games WHERE outcome='ended' GROUP BY 1`).
+- Browse/query/export directly in Neon's SQL editor, e.g.:
+  ```sql
+  SELECT name, is_bot, archetype, final_rank, final_coins FROM game_players WHERE game_id = 5 ORDER BY final_rank;
+  SELECT name, count(*) AS games, avg(final_coins)::int AS avg_coins FROM game_players WHERE is_bot = false GROUP BY name;
+  SELECT winner_archetype, count(*) FROM games WHERE outcome='ended' GROUP BY 1;
+  ```
 - Or use the built-in read-only JSON API:
   - `GET /api/stats` — totals, outcome breakdown, avg rounds to win, wins by archetype
   - `GET /api/games?limit=20` — recent games (summary)
-  - `GET /api/games/:id` — one game with its full round history
+  - `GET /api/games/:id` — one game with its players list and full round history
 
 Player names are stored as typed. If you'd prefer anonymised records, say so and
 the names can be dropped in favour of archetype + a random id.

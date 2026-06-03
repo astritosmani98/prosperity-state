@@ -71,9 +71,27 @@ ALTER TABLE game_rounds ADD COLUMN IF NOT EXISTS infrastructure JSONB;
 ALTER TABLE game_rounds ADD COLUMN IF NOT EXISTS tax_policy     TEXT;
 ALTER TABLE game_rounds ADD COLUMN IF NOT EXISTS welfare_policy TEXT;
 
+-- One clean row per player per game (names + bot flag as real columns).
+CREATE TABLE IF NOT EXISTS game_players (
+  id              BIGSERIAL PRIMARY KEY,
+  game_id         BIGINT NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+  player_id       TEXT,
+  name            TEXT NOT NULL,
+  is_bot          BOOLEAN NOT NULL,
+  archetype       TEXT,
+  final_coins     INT,
+  final_influence INT,
+  final_rank      INT,
+  alive           BOOLEAN,
+  bankrupt        BOOLEAN
+);
+
 CREATE INDEX IF NOT EXISTS idx_games_created  ON games(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_games_outcome  ON games(outcome);
 CREATE INDEX IF NOT EXISTS idx_rounds_game    ON game_rounds(game_id);
+CREATE INDEX IF NOT EXISTS idx_players_game   ON game_players(game_id);
+CREATE INDEX IF NOT EXISTS idx_players_name   ON game_players(name);
+CREATE INDEX IF NOT EXISTS idx_players_is_bot ON game_players(is_bot);
 `;
 
 export async function initDb() {
@@ -139,6 +157,17 @@ export async function recordGame(state, roomCode) {
     );
     const gameId = g.rows[0].id;
 
+    // One row per player (names + bot flag as queryable columns).
+    const rankById = new Map(ranking.map((r) => [r.id, r.rank]));
+    for (const p of Object.values(state.players)) {
+      await client.query(
+        `INSERT INTO game_players
+          (game_id, player_id, name, is_bot, archetype, final_coins, final_influence, final_rank, alive, bankrupt)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`,
+        [gameId, p.id, p.name, p.isBot, p.archetype ?? null, p.coins, p.influence, rankById.get(p.id) ?? null, p.alive, p.bankrupt]
+      );
+    }
+
     for (const r of state.roundHistory || []) {
       await client.query(
         `INSERT INTO game_rounds
@@ -187,8 +216,12 @@ export async function gameDetail(id) {
   if (!ready) return null;
   const g = await pool.query('SELECT * FROM games WHERE id = $1', [id]);
   if (!g.rows[0]) return null;
+  const ppl = await pool.query(
+    'SELECT name, is_bot, archetype, final_coins, final_influence, final_rank, alive, bankrupt FROM game_players WHERE game_id = $1 ORDER BY final_rank NULLS LAST',
+    [id]
+  );
   const r = await pool.query('SELECT * FROM game_rounds WHERE game_id = $1 ORDER BY round', [id]);
-  return { ...g.rows[0], rounds_detail: r.rows };
+  return { ...g.rows[0], players_list: ppl.rows, rounds_detail: r.rows };
 }
 
 export async function stats() {
