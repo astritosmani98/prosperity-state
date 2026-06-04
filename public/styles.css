@@ -399,6 +399,18 @@ input:focus { outline: none; border-color: var(--gold); }
 @media (max-width: 1000px) {
   .game-grid { grid-template-columns: 1fr; }
   .home-cards { grid-template-columns: 1fr; }
+
+  /* Single-column (mobile) stacking: flatten the column wrappers so every card
+     becomes a direct grid item, then order them explicitly. Topbar (Prosperity)
+     stays pinned above the grid. Order: voting → scoreboard → city → the rest. */
+  .col { display: contents; }
+  .action-card     { order: 1; }   /* voting / contribution panel */
+  .scoreboard-card { order: 2; }   /* citizens */
+  .cityscape-card  { order: 3; }   /* city graphics */
+  .you-card        { order: 4; }
+  .lastround-card  { order: 5; }
+  .infra-card      { order: 6; }
+  .log-card        { order: 7; }
 }
 
 /* ---------- phones ---------- */
