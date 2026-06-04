@@ -130,10 +130,41 @@ function renderLobby(msg) {
   }
 }
 
-$('btn-copy').onclick = () => {
-  navigator.clipboard?.writeText($('lobby-code').textContent);
-  $('btn-copy').textContent = 'Copied!';
-  setTimeout(() => ($('btn-copy').textContent = 'Copy'), 1200);
+// Robust copy that also works on plain-http LAN (no secure clipboard API).
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+  } catch { /* fall through */ }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch { return false; }
+}
+function inviteLink() {
+  return `${location.origin}${location.pathname}?join=${$('lobby-code').textContent}`;
+}
+function flash(btn, msg, original) {
+  btn.textContent = msg;
+  setTimeout(() => (btn.textContent = original), 1500);
+}
+
+$('btn-copy').onclick = async () => {
+  const ok = await copyText($('lobby-code').textContent);
+  flash($('btn-copy'), ok ? 'Copied!' : 'Copy failed', 'Copy code');
+};
+$('btn-share').onclick = async () => {
+  const url = inviteLink();
+  const code = $('lobby-code').textContent;
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Prosperity State', text: `Join my game of Prosperity State — room ${code}`, url }); return; }
+    catch { return; } // shared or cancelled
+  }
+  const ok = await copyText(url);
+  flash($('btn-share'), ok ? 'Link copied!' : 'Copy failed', 'Share link');
 };
 $('target-range').oninput = (e) => {
   $('target-label').textContent = e.target.value;
@@ -568,6 +599,14 @@ function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 function cap(s) { return String(s || '').charAt(0).toUpperCase() + String(s || '').slice(1); }
+
+// If opened via an invite link (?join=CODE), pre-fill the join code so the
+// friend only needs to type a name and tap Join.
+const joinParam = new URLSearchParams(location.search).get('join');
+if (joinParam) {
+  $('join-code').value = joinParam.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+  setTimeout(() => $('join-name').focus(), 50);
+}
 
 // On load, attempt to resume an in-progress game.
 tryReconnect();
