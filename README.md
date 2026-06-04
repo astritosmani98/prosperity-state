@@ -24,9 +24,24 @@ works on mobile web browsers (phones/tablets) as well as desktop.
 
 ### Play with friends on other devices
 The server must be reachable by the other players. On the same LAN they can use
-your machine's IP (`http://<your-ip>:3000`). To play over the internet, deploy to
-any Node host (Render / Railway / Fly.io / a VPS) — it's a single `npm start`
-process.
+your machine's IP (`http://<your-ip>:3000`). To play over the internet, deploy it
+(it's a single `npm start` process).
+
+### Deploy to Render (free)
+A [`render.yaml`](render.yaml) blueprint is included, so:
+1. Push this repo to GitHub (already done if you cloned it from there).
+2. At <https://dashboard.render.com> → **New ▸ Blueprint**, connect the repo.
+   Render reads `render.yaml` and creates the web service.
+3. When prompted (or under the service's **Environment** tab), set `DATABASE_URL`
+   to your Neon connection string so live games are recorded. (Skip it and the
+   game still runs, just without persistence.)
+4. Deploy → you get a public `https://<name>.onrender.com` URL. Share it (or the
+   in-lobby invite link) and play from anywhere.
+
+Notes: the free instance sleeps after ~15 min idle, so the first visit after a
+quiet spell waits ~30–60 s to wake. WebSockets and HTTPS work out of the box, so
+the client auto-uses `wss://`. To use a custom domain, add it under the service's
+**Settings ▸ Custom Domains** and point a DNS record at Render.
 
 ## Game records (optional)
 

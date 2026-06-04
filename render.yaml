@@ -1,0 +1,17 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# One web service running the Node + WebSocket server. WebSockets work on Render
+# out of the box. Set DATABASE_URL (your Neon string) in the dashboard to record
+# games; without it the game still runs, just without persistence.
+services:
+  - type: web
+    name: prosperity-state
+    runtime: node
+    plan: free
+    region: frankfurt            # near the Neon eu-central database; change if you prefer
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    autoDeploy: true             # redeploys automatically on every push to the repo
+    envVars:
+      - key: DATABASE_URL
+        sync: false              # set this in the Render dashboard (kept secret, not in git)
