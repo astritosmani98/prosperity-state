@@ -83,6 +83,8 @@ export const BOT_ARCHETYPES = [
 
 // Friendly names pool for bots.
 export const BOT_NAMES = [
-  'Ava', 'Boris', 'Cira', 'Dmitri', 'Esma', 'Faruk',
-  'Gora', 'Hana', 'Iva', 'Jovan', 'Kira', 'Luka',
+  'Arben', 'Lira', 'Dren', 'Besa', 'Luan', 'Kaltrina',
+  'Ilir', 'Era', 'Fisnik', 'Jon', 'Nora', 'Valon',
+  'Alex', 'Sofia', 'Maya', 'Liam', 'Noah', 'Emma',
+  'Lucas', 'Nina', 'Daniel', 'Blin'
 ];
