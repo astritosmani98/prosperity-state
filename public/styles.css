@@ -102,6 +102,14 @@ input:focus { outline: none; border-color: var(--gold); }
 .rules { text-align: left; margin: 14px auto 0; max-width: 640px; color: var(--muted); }
 .rules summary { cursor: pointer; color: var(--gold); font-weight: 600; }
 .rules ul { line-height: 1.6; font-size: .9rem; }
+.rules-body { font-size: .9rem; line-height: 1.55; margin-top: 6px; }
+.rules-body h4 { margin: 16px 0 4px; color: var(--gold); font-size: .95rem; }
+.rules-body h4:first-child { margin-top: 6px; }
+.rules-body p { margin: 4px 0; }
+.rules-body ul { margin: 4px 0; padding-left: 20px; }
+.rules-body li { margin: 3px 0; }
+.rules-body b { color: var(--text); }
+.rules-body i { color: var(--muted); }
 
 /* ---------- lobby ---------- */
 .lobby-card { width: min(520px, 100%); }
