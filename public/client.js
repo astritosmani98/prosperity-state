@@ -1,5 +1,5 @@
 // ============================================================================
-// Prosperity State — browser client
+// Prosperity State: browser client
 // Talks to the server over a single WebSocket. The server is authoritative;
 // the client only renders state and sends the player's actions.
 // ============================================================================
@@ -160,7 +160,7 @@ $('btn-share').onclick = async () => {
   const url = inviteLink();
   const code = $('lobby-code').textContent;
   if (navigator.share) {
-    try { await navigator.share({ title: 'Prosperity State', text: `Join my game of Prosperity State — room ${code}`, url }); return; }
+    try { await navigator.share({ title: 'Prosperity State', text: `Join my game of Prosperity State, room ${code}`, url }); return; }
     catch { return; } // shared or cancelled
   }
   const ok = await copyText(url);
@@ -203,7 +203,7 @@ function renderGame(s) {
 }
 
 // ----------------------------------------------------------------------------
-// Cityscape — the society map that visibly grows with Prosperity & infrastructure
+// Cityscape: the society map that visibly grows with Prosperity & infrastructure
 // ----------------------------------------------------------------------------
 let cityPrev = null;  // last-seen infrastructure levels, to detect upgrades
 let rainBuilt = false;
@@ -361,7 +361,7 @@ function renderFreeRiderBanner(s) {
   } else {
     const names = fr.map((f) => escapeHtml(f.name)).join(', ');
     banner.innerHTML = `⚠ <b>${names}</b> ${fr.length > 1 ? 'are' : 'is'} free-riding. Citizens are withholding
-      in protest — Prosperity will keep <b>falling</b> until they contribute.`;
+      in protest, so Prosperity will keep <b>falling</b> until they contribute.`;
   }
 }
 
@@ -386,7 +386,7 @@ function renderPlayers(s) {
     // "Gave" persists across rounds. During the contribute phase, also show whether
     // THIS round's contribution is locked in (amount stays hidden until resolve).
     let gave;
-    if (p.lastContribution == null) gave = '<span class="muted">—</span>';
+    if (p.lastContribution == null) gave = '<span class="muted">·</span>';
     else {
       const star = p.lastContribution === topGave && topGave > 0 ? ' <span title="Top contributor">⭐</span>' : '';
       gave = `<b class="coins-cell">${p.lastContribution}</b>${star}`;
@@ -446,7 +446,7 @@ function renderLastRound(s) {
   if (!r) { el.innerHTML = '<span class="muted">The first round hasn\'t resolved yet.</span>'; return; }
   const lines = [];
   if (r.belowThreshold) {
-    lines.push(`<div class="lr-line lr-bad">⛔ Pooled only <b>${r.pool}</b> / ${r.threshold} needed — nothing built, <b>−${r.neglect}</b> Prosperity (neglect).</div>`);
+    lines.push(`<div class="lr-line lr-bad">⛔ Pooled only <b>${r.pool}</b> / ${r.threshold} needed, so nothing built, <b>−${r.neglect}</b> Prosperity (neglect).</div>`);
   } else {
     lines.push(`<div class="lr-line">Citizens pooled <b class="lr-gold">${r.pool}</b> Coins <span class="muted">(min ${r.threshold})</span> → <b class="lr-good">+${r.deltaP}</b> Prosperity <span class="muted">(K=${r.K})</span></div>`);
     lines.push(`<div class="lr-line muted">Built toward: ${cap(r.focus)}</div>`);
@@ -519,10 +519,10 @@ function renderContributeUI(s, card) {
 
   pendingContribution = Math.min(pendingContribution, income);
   card.innerHTML = `
-    <h3>Your move — Round ${s.round}</h3>
+    <h3>Your move · Round ${s.round}</h3>
     <p class="muted">You earned <b style="color:var(--gold)">${income}</b> income. How much do you give to the nation?</p>
     <div class="threshold-note">🏗 Citizens must pool <b>${s.roundThreshold}</b> Coins together this round to build
-      <b>${cap(s.infraFocus)}</b> — fall short and Prosperity drops <b>${s.neglectPenalty}</b> with no construction.</div>
+      <b>${cap(s.infraFocus)}</b>. Fall short and Prosperity drops <b>${s.neglectPenalty}</b> with no construction.</div>
     <button id="btn-fairshare" class="btn fairshare" data-amount="${fairShare}">⚖ Donate equal share (${fairShare}) to meet the minimum</button>
     <div class="contribute-ui">
       <div class="split"><span>Keep <b id="keep-amt">${income - pendingContribution}</b></span><span>Contribute <b id="give-amt">${pendingContribution}</b></span></div>
