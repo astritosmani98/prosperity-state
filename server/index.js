@@ -36,6 +36,7 @@ function sendJson(res, code, obj) {
 
 async function handleApi(req, res, urlPath, query) {
   try {
+    if (urlPath === '/api/live') return sendJson(res, 200, manager.liveSummary());
     if (urlPath === '/api/stats') return sendJson(res, 200, await stats());
     if (urlPath === '/api/games') {
       const limit = parseInt(query.get('limit'), 10) || 20;

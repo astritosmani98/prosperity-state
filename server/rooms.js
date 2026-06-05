@@ -49,6 +49,24 @@ export class RoomManager {
   }
   get(code) { return this.rooms.get((code || '').toUpperCase()); }
   remove(code) { this.rooms.delete(code); }
+
+  /** Snapshot of current live activity (for the /api/live endpoint). */
+  liveSummary() {
+    let activeRooms = 0, inLobby = 0, gamesInProgress = 0, connectedPlayers = 0;
+    for (const room of this.rooms.values()) {
+      activeRooms++;
+      connectedPlayers += room.humans().filter((p) => p.connected).length;
+      if (!room.state) inLobby++;
+      else if (room.state.phase !== 'ended' && room.state.phase !== 'collapsed') gamesInProgress++;
+    }
+    return {
+      connectedPlayers,
+      gamesInProgress,
+      inLobby,
+      activeRooms,
+      safeToDeploy: connectedPlayers === 0, // nobody connected anywhere = safe to redeploy
+    };
+  }
 }
 
 export class Room {
