@@ -6,7 +6,7 @@ services:
   - type: web
     name: prosperity-state
     runtime: node
-    plan: free
+    plan: starter               # always-on (no sleep/cold-starts); ~$7/mo. Requires a payment method on the Render account.
     region: frankfurt            # near the Neon eu-central database; change if you prefer
     buildCommand: npm install
     startCommand: npm start
