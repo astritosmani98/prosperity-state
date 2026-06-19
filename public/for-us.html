@@ -427,7 +427,7 @@
 
   function updateDisplay(which, count, animate) {
     const isHer = which === 'for-her';
-    const countEl = document.getElementById(isHer ? 'count-for-her' : 'count-for-him');
+    const countEl = document.getElementById(isHer ? 'count-for-him' : 'count-for-her');
     countEl.textContent = count;
 
     if (animate) {
@@ -438,11 +438,11 @@
     document.getElementById(`use-${which}`).disabled = count <= 0;
 
     const over = count >= OVERFLOW;
-    document.getElementById(isHer ? 'overflow-for-her' : 'overflow-for-him')
+    document.getElementById(isHer ? 'overflow-for-him' : 'overflow-for-her')
       .setAttribute('display', over ? '' : 'none');
 
     // Update jar fill level (fills up to OVERFLOW)
-    const fillId = isHer ? 'boy-jar-fill' : 'girl-jar-fill';
+    const fillId = isHer ? 'girl-jar-fill' : 'boy-jar-fill';
     const fill = document.getElementById(fillId);
     const pct = Math.min(count / OVERFLOW, 1);
     const maxH = 46, bottom = 216;
