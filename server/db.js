@@ -94,14 +94,10 @@ CREATE INDEX IF NOT EXISTS idx_players_name   ON game_players(name);
 CREATE INDEX IF NOT EXISTS idx_players_is_bot ON game_players(is_bot);
 
 CREATE TABLE IF NOT EXISTS hugs (
-  id      INT PRIMARY KEY DEFAULT 1,
-  count   INT NOT NULL DEFAULT 0,
-  for_her INT NOT NULL DEFAULT 0,
-  for_him INT NOT NULL DEFAULT 0
+  id    INT PRIMARY KEY DEFAULT 1,
+  count INT NOT NULL DEFAULT 0
 );
-INSERT INTO hugs (id, count, for_her, for_him) VALUES (1, 0, 0, 0) ON CONFLICT DO NOTHING;
-ALTER TABLE hugs ADD COLUMN IF NOT EXISTS for_her INT NOT NULL DEFAULT 0;
-ALTER TABLE hugs ADD COLUMN IF NOT EXISTS for_him INT NOT NULL DEFAULT 0;
+INSERT INTO hugs (id, count) VALUES (1, 0) ON CONFLICT DO NOTHING;
 `;
 
 export async function initDb() {
@@ -119,6 +115,8 @@ export async function initDb() {
   });
   try {
     await pool.query(SCHEMA_SQL);
+    await pool.query('ALTER TABLE hugs ADD COLUMN IF NOT EXISTS for_her INT NOT NULL DEFAULT 0');
+    await pool.query('ALTER TABLE hugs ADD COLUMN IF NOT EXISTS for_him INT NOT NULL DEFAULT 0');
     ready = true;
     console.log('  Game records: connected to Postgres ✓');
   } catch (e) {
