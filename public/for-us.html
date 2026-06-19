@@ -3,249 +3,480 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Our Hug Jar</title>
+  <title>Our Hugs</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       min-height: 100dvh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #ffe4ec 0%, #ffd6e8 50%, #fce4f3 100%);
+      background: linear-gradient(160deg, #ffe4f0 0%, #eee4ff 60%, #e0eeff 100%);
       font-family: 'Georgia', serif;
-      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 3rem;
+      gap: 1.5rem;
     }
 
-    .card {
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 200, 220, 0.5);
-      border-radius: 2rem;
-      padding: 3rem 2.5rem;
-      text-align: center;
-      max-width: 380px;
+    header { text-align: center; }
+    header h1 { color: #b85080; font-size: 1.8rem; font-weight: normal; }
+    header p  { color: #c090b0; font-size: 0.85rem; margin-top: 0.25rem; }
+
+    /* ── Panels ── */
+    .panels {
+      display: flex;
+      gap: 1.2rem;
       width: 100%;
-      box-shadow: 0 8px 32px rgba(220, 100, 140, 0.12);
+      max-width: 680px;
+      align-items: flex-start;
     }
 
-    .jar {
-      font-size: 5rem;
+    @media (max-width: 540px) {
+      .panels { flex-direction: column; align-items: center; }
+      .panel { width: 100%; max-width: 310px; }
+    }
+
+    .panel {
+      flex: 1;
+      background: rgba(255,255,255,0.58);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,190,220,0.45);
+      border-radius: 1.6rem;
+      padding: 1.4rem 1.2rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 6px 28px rgba(180,90,140,0.1);
+    }
+
+    .panel-label {
+      font-size: 0.72rem;
+      color: #c098b8;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    /* ── Avatar row ── */
+    .avatar-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 0.6rem;
+      width: 100%;
+    }
+
+    .char-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .char-wrap span {
+      font-size: 0.68rem;
+      color: #c098b8;
+    }
+
+    /* ── Characters ── */
+    .character { width: 66px; height: 78px; }
+
+    .character .happy-eyes,
+    .character .happy-mouth,
+    .character .blush { display: none; }
+
+    .character.happy .normal-eyes,
+    .character.happy .normal-mouth { display: none; }
+
+    .character.happy .happy-eyes,
+    .character.happy .happy-mouth,
+    .character.happy .blush { display: block; }
+
+    /* ── Jar + count ── */
+    .jar-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.15rem;
+      position: relative;
+    }
+
+    .jar-emoji {
+      font-size: 2.6rem;
       line-height: 1;
-      margin-bottom: 0.5rem;
       display: block;
-      animation: float 3s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
     }
 
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
+    .jar-emoji.bump { animation: jarPop 0.3s ease; }
+
+    @keyframes jarPop {
+      0%   { transform: scale(1) rotate(0deg); }
+      40%  { transform: scale(1.3) rotate(-8deg); }
+      100% { transform: scale(1) rotate(0deg); }
     }
 
-    h1 {
-      color: #c45f80;
-      font-size: 1.6rem;
-      font-weight: normal;
-      margin-bottom: 0.3rem;
-      letter-spacing: 0.02em;
+    .jar-emoji.overflowing { animation: jarWobble 0.55s ease-in-out infinite alternate; }
+
+    @keyframes jarWobble {
+      from { transform: rotate(-9deg); }
+      to   { transform: rotate(9deg); }
     }
 
-    .subtitle {
-      color: #d48fa8;
-      font-size: 0.9rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .counter-wrap {
-      margin-bottom: 2.5rem;
-    }
-
-    .counter {
-      font-size: 5.5rem;
+    .jar-count {
+      font-size: 2rem;
       font-weight: bold;
-      color: #c45f80;
+      color: #b85080;
       line-height: 1;
       transition: transform 0.15s ease;
     }
 
-    .counter.bump {
-      transform: scale(1.25);
-    }
+    .jar-count.bump { transform: scale(1.35); }
 
-    .counter-label {
-      font-size: 1rem;
-      color: #d48fa8;
-      margin-top: 0.4rem;
-    }
+    .jar-count-label { font-size: 0.7rem; color: #d0a0b8; }
 
-    .buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
+    /* ── Buttons ── */
+    .btn-row { display: flex; flex-direction: column; gap: 0.55rem; width: 100%; }
 
     .btn {
       border: none;
-      border-radius: 1.2rem;
-      padding: 1rem 1.5rem;
-      font-size: 1.1rem;
+      border-radius: 1rem;
+      padding: 0.7rem 1rem;
+      font-size: 0.9rem;
       font-family: inherit;
       cursor: pointer;
-      transition: transform 0.12s ease, box-shadow 0.12s ease;
       font-weight: 600;
-      letter-spacing: 0.01em;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
-
-    .btn:active { transform: scale(0.96); }
+    .btn:active { transform: scale(0.96) !important; }
 
     .btn-store {
-      background: linear-gradient(135deg, #f0829e, #e8607f);
+      background: linear-gradient(135deg, #f0809c, #e05878);
       color: white;
-      box-shadow: 0 4px 16px rgba(220, 80, 120, 0.3);
+      box-shadow: 0 3px 14px rgba(210,70,110,0.3);
     }
-
-    .btn-store:hover {
-      box-shadow: 0 6px 20px rgba(220, 80, 120, 0.45);
-      transform: translateY(-1px);
-    }
+    .btn-store:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(210,70,110,0.42); }
 
     .btn-use {
       background: white;
-      color: #c45f80;
-      border: 2px solid #f0a8bc;
-      box-shadow: 0 2px 8px rgba(220, 100, 140, 0.1);
+      color: #b85080;
+      border: 2px solid #f0a0c0;
     }
+    .btn-use:hover { background: #fff0f7; transform: translateY(-1px); }
+    .btn-use:disabled { opacity: 0.38; cursor: not-allowed; transform: none !important; }
 
-    .btn-use:hover {
-      background: #fff0f5;
-      transform: translateY(-1px);
-    }
-
-    .btn-use:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .message {
-      margin-top: 1.2rem;
-      min-height: 1.5rem;
-      font-size: 0.9rem;
-      color: #d48fa8;
+    /* ── Message ── */
+    #message {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #c890b0;
       font-style: italic;
-      transition: opacity 0.3s ease;
+      min-height: 1.4rem;
     }
 
-    .hearts {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
+    /* ── Floating hearts overlay ── */
+    #float-layer { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
 
-    .heart {
+    .fheart {
       position: absolute;
-      font-size: 1.5rem;
-      animation: rise 1.4s ease-out forwards;
+      font-size: 1.4rem;
+      animation: frise 1.5s ease-out forwards;
       opacity: 0;
     }
 
-    @keyframes rise {
+    @keyframes frise {
       0%   { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-200px) scale(0.5); }
+      100% { opacity: 0; transform: translateY(-200px) scale(0.4); }
     }
   </style>
 </head>
 <body>
-  <div class="hearts" id="hearts"></div>
-
-  <div class="card">
-    <span class="jar">🫙</span>
+  <header>
     <h1>Our Hug Jar</h1>
-    <p class="subtitle">a little something for when we're apart</p>
+    <p>saved up for when we need one</p>
+  </header>
 
-    <div class="counter-wrap">
-      <div class="counter" id="counter">...</div>
-      <div class="counter-label">hugs saved up</div>
+  <div class="panels">
+
+    <!-- ══ Panel 1: his hugs for her ══ -->
+    <div class="panel">
+      <div class="panel-label">from him, for her</div>
+
+      <div class="avatar-row">
+        <!-- Boy (sender — always normal) -->
+        <div class="char-wrap">
+          <svg viewBox="0 0 80 90" class="character" xmlns="http://www.w3.org/2000/svg">
+            <rect x="22" y="74" width="36" height="16" rx="6" fill="#7090c0"/>
+            <rect x="34" y="66" width="12" height="11" fill="#fce0bf"/>
+            <ellipse cx="14" cy="48" rx="6" ry="8" fill="#fce0bf"/>
+            <ellipse cx="66" cy="48" rx="6" ry="8" fill="#fce0bf"/>
+            <ellipse cx="40" cy="47" rx="26" ry="27" fill="#fce0bf"/>
+            <ellipse cx="40" cy="26" rx="26" ry="19" fill="#1c1c1c"/>
+            <rect x="14" y="31" width="52" height="13" fill="#1c1c1c"/>
+            <path d="M14 40 Q22 33 30 37" fill="#1c1c1c"/>
+            <path d="M66 40 Q58 33 50 37" fill="#1c1c1c"/>
+            <g class="normal-eyes">
+              <ellipse cx="30" cy="48" rx="5.5" ry="6.5" fill="#252525"/>
+              <ellipse cx="50" cy="48" rx="5.5" ry="6.5" fill="#252525"/>
+              <circle cx="32" cy="45" r="2" fill="white"/>
+              <circle cx="52" cy="45" r="2" fill="white"/>
+              <circle cx="33.5" cy="43.5" r="0.9" fill="white"/>
+              <circle cx="53.5" cy="43.5" r="0.9" fill="white"/>
+            </g>
+            <g class="happy-eyes">
+              <path d="M24 48 Q30 42 36 48" stroke="#252525" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+              <path d="M44 48 Q50 42 56 48" stroke="#252525" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+            </g>
+            <path class="normal-mouth" d="M34 61 Q40 67 46 61" stroke="#c87860" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path class="happy-mouth" d="M31 59 Q40 71 49 59" stroke="#c87860" stroke-width="2.2" fill="#ffb09a" stroke-linecap="round"/>
+            <ellipse class="blush" cx="20" cy="56" rx="8" ry="4.5" fill="#ffb3c1" opacity="0.65"/>
+            <ellipse class="blush" cx="60" cy="56" rx="8" ry="4.5" fill="#ffb3c1" opacity="0.65"/>
+          </svg>
+          <span>him</span>
+        </div>
+
+        <!-- Jar -->
+        <div class="jar-display">
+          <span class="jar-emoji" id="jar-for-her">🫙</span>
+          <div class="jar-count" id="count-for-her">…</div>
+          <div class="jar-count-label">hugs</div>
+        </div>
+
+        <!-- Girl (receiver — happy when overflow) -->
+        <div class="char-wrap">
+          <svg viewBox="0 0 80 90" class="character" id="receiver-for-her" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="40" cy="60" rx="30" ry="36" fill="#f0c030"/>
+            <rect x="20" y="74" width="40" height="16" rx="6" fill="#e890c8"/>
+            <rect x="34" y="66" width="12" height="11" fill="#fce0bf"/>
+            <ellipse cx="13" cy="48" rx="6" ry="8" fill="#fce0bf"/>
+            <ellipse cx="67" cy="48" rx="6" ry="8" fill="#fce0bf"/>
+            <ellipse cx="40" cy="46" rx="25" ry="26" fill="#fce0bf"/>
+            <ellipse cx="40" cy="25" rx="25" ry="17" fill="#f0c030"/>
+            <rect x="15" y="28" width="50" height="13" fill="#f0c030"/>
+            <ellipse cx="34" cy="23" rx="9" ry="5.5" fill="#f8d848" opacity="0.6"/>
+            <g class="normal-eyes">
+              <ellipse cx="28" cy="45" rx="7.5" ry="8.5" fill="#4a3080"/>
+              <ellipse cx="52" cy="45" rx="7.5" ry="8.5" fill="#4a3080"/>
+              <ellipse cx="28" cy="45" rx="5.5" ry="6.5" fill="#6a50b8"/>
+              <ellipse cx="52" cy="45" rx="5.5" ry="6.5" fill="#6a50b8"/>
+              <circle cx="30" cy="41.5" r="2.5" fill="white"/>
+              <circle cx="54" cy="41.5" r="2.5" fill="white"/>
+              <circle cx="32" cy="40" r="1" fill="white"/>
+              <circle cx="56" cy="40" r="1" fill="white"/>
+              <line x1="20.5" y1="40" x2="18" y2="37" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="23" y1="38.5" x2="21.5" y2="35.5" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="26" y1="37.5" x2="25.5" y2="34.5" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="59.5" y1="40" x2="62" y2="37" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="57" y1="38.5" x2="58.5" y2="35.5" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="54" y1="37.5" x2="54.5" y2="34.5" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+            <g class="happy-eyes">
+              <text x="28" y="52" font-size="15" text-anchor="middle" fill="#f0c030">✦</text>
+              <text x="52" y="52" font-size="15" text-anchor="middle" fill="#f0c030">✦</text>
+            </g>
+            <path class="normal-mouth" d="M33 60 Q40 66 47 60" stroke="#c87860" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path class="happy-mouth" d="M30 58 Q40 71 50 58" stroke="#c87860" stroke-width="2.2" fill="#ffb09a" stroke-linecap="round"/>
+            <ellipse class="blush" cx="18" cy="55" rx="8" ry="4.5" fill="#ffb3c1" opacity="0.7"/>
+            <ellipse class="blush" cx="62" cy="55" rx="8" ry="4.5" fill="#ffb3c1" opacity="0.7"/>
+          </svg>
+          <span>her</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-store" onclick="storeHug('for-her')">🤗 He sends a hug</button>
+        <button class="btn btn-use" id="use-for-her" onclick="useHug('for-her')">💝 She uses a hug</button>
+      </div>
     </div>
 
-    <div class="buttons">
-      <button class="btn btn-store" onclick="action('store')">🤗 Send a hug</button>
-      <button class="btn btn-use" id="btn-use" onclick="action('use')">💝 Use a hug</button>
+    <!-- ══ Panel 2: her hugs for him ══ -->
+    <div class="panel">
+      <div class="panel-label">from her, for him</div>
+
+      <div class="avatar-row">
+        <!-- Girl (sender — always normal) -->
+        <div class="char-wrap">
+          <svg viewBox="0 0 80 90" class="character" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="40" cy="60" rx="30" ry="36" fill="#f0c030"/>
+            <rect x="20" y="74" width="40" height="16" rx="6" fill="#e890c8"/>
+            <rect x="34" y="66" width="12" height="11" fill="#fce0bf"/>
+            <ellipse cx="13" cy="48" rx="6" ry="8" fill="#fce0bf"/>
+            <ellipse cx="67" cy="48" rx="6" ry="8" fill="#fce0bf"/>
+            <ellipse cx="40" cy="46" rx="25" ry="26" fill="#fce0bf"/>
+            <ellipse cx="40" cy="25" rx="25" ry="17" fill="#f0c030"/>
+            <rect x="15" y="28" width="50" height="13" fill="#f0c030"/>
+            <ellipse cx="34" cy="23" rx="9" ry="5.5" fill="#f8d848" opacity="0.6"/>
+            <g class="normal-eyes">
+              <ellipse cx="28" cy="45" rx="7.5" ry="8.5" fill="#4a3080"/>
+              <ellipse cx="52" cy="45" rx="7.5" ry="8.5" fill="#4a3080"/>
+              <ellipse cx="28" cy="45" rx="5.5" ry="6.5" fill="#6a50b8"/>
+              <ellipse cx="52" cy="45" rx="5.5" ry="6.5" fill="#6a50b8"/>
+              <circle cx="30" cy="41.5" r="2.5" fill="white"/>
+              <circle cx="54" cy="41.5" r="2.5" fill="white"/>
+              <circle cx="32" cy="40" r="1" fill="white"/>
+              <circle cx="56" cy="40" r="1" fill="white"/>
+              <line x1="20.5" y1="40" x2="18" y2="37" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="23" y1="38.5" x2="21.5" y2="35.5" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="26" y1="37.5" x2="25.5" y2="34.5" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="59.5" y1="40" x2="62" y2="37" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="57" y1="38.5" x2="58.5" y2="35.5" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="54" y1="37.5" x2="54.5" y2="34.5" stroke="#333" stroke-width="1.5" stroke-linecap="round"/>
+            </g>
+            <g class="happy-eyes">
+              <text x="28" y="52" font-size="15" text-anchor="middle" fill="#f0c030">✦</text>
+              <text x="52" y="52" font-size="15" text-anchor="middle" fill="#f0c030">✦</text>
+            </g>
+            <path class="normal-mouth" d="M33 60 Q40 66 47 60" stroke="#c87860" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path class="happy-mouth" d="M30 58 Q40 71 50 58" stroke="#c87860" stroke-width="2.2" fill="#ffb09a" stroke-linecap="round"/>
+            <ellipse class="blush" cx="18" cy="55" rx="8" ry="4.5" fill="#ffb3c1" opacity="0.7"/>
+            <ellipse class="blush" cx="62" cy="55" rx="8" ry="4.5" fill="#ffb3c1" opacity="0.7"/>
+          </svg>
+          <span>her</span>
+        </div>
+
+        <!-- Jar -->
+        <div class="jar-display">
+          <span class="jar-emoji" id="jar-for-him">🫙</span>
+          <div class="jar-count" id="count-for-him">…</div>
+          <div class="jar-count-label">hugs</div>
+        </div>
+
+        <!-- Boy (receiver — happy when overflow) -->
+        <div class="char-wrap">
+          <svg viewBox="0 0 80 90" class="character" id="receiver-for-him" xmlns="http://www.w3.org/2000/svg">
+            <rect x="22" y="74" width="36" height="16" rx="6" fill="#7090c0"/>
+            <rect x="34" y="66" width="12" height="11" fill="#fce0bf"/>
+            <ellipse cx="14" cy="48" rx="6" ry="8" fill="#fce0bf"/>
+            <ellipse cx="66" cy="48" rx="6" ry="8" fill="#fce0bf"/>
+            <ellipse cx="40" cy="47" rx="26" ry="27" fill="#fce0bf"/>
+            <ellipse cx="40" cy="26" rx="26" ry="19" fill="#1c1c1c"/>
+            <rect x="14" y="31" width="52" height="13" fill="#1c1c1c"/>
+            <path d="M14 40 Q22 33 30 37" fill="#1c1c1c"/>
+            <path d="M66 40 Q58 33 50 37" fill="#1c1c1c"/>
+            <g class="normal-eyes">
+              <ellipse cx="30" cy="48" rx="5.5" ry="6.5" fill="#252525"/>
+              <ellipse cx="50" cy="48" rx="5.5" ry="6.5" fill="#252525"/>
+              <circle cx="32" cy="45" r="2" fill="white"/>
+              <circle cx="52" cy="45" r="2" fill="white"/>
+              <circle cx="33.5" cy="43.5" r="0.9" fill="white"/>
+              <circle cx="53.5" cy="43.5" r="0.9" fill="white"/>
+            </g>
+            <g class="happy-eyes">
+              <path d="M24 48 Q30 42 36 48" stroke="#252525" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+              <path d="M44 48 Q50 42 56 48" stroke="#252525" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+            </g>
+            <path class="normal-mouth" d="M34 61 Q40 67 46 61" stroke="#c87860" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path class="happy-mouth" d="M31 59 Q40 71 49 59" stroke="#c87860" stroke-width="2.2" fill="#ffb09a" stroke-linecap="round"/>
+            <ellipse class="blush" cx="20" cy="56" rx="8" ry="4.5" fill="#ffb3c1" opacity="0.65"/>
+            <ellipse class="blush" cx="60" cy="56" rx="8" ry="4.5" fill="#ffb3c1" opacity="0.65"/>
+          </svg>
+          <span>him</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-store" onclick="storeHug('for-him')">🤗 She sends a hug</button>
+        <button class="btn btn-use" id="use-for-him" onclick="useHug('for-him')">💝 He uses a hug</button>
+      </div>
     </div>
 
-    <div class="message" id="message"></div>
   </div>
 
-  <script>
-    let currentCount = null;
+  <div id="message"></div>
+  <div id="float-layer"></div>
 
-    async function fetchCount() {
+  <script>
+    const OVERFLOW = 27;
+    const counts = { 'for-her': 0, 'for-him': 0 };
+
+    async function fetchCounts() {
       try {
         const r = await fetch('/api/hugs');
-        const { count } = await r.json();
-        updateDisplay(count, false);
-      } catch { /* silent */ }
+        const { forHer, forHim } = await r.json();
+        updateDisplay('for-her', forHer, false);
+        updateDisplay('for-him', forHim, false);
+      } catch {}
     }
 
-    function updateDisplay(count, animate) {
-      currentCount = count;
-      const el = document.getElementById('counter');
-      el.textContent = count;
-      document.getElementById('btn-use').disabled = count <= 0;
+    function updateDisplay(which, count, animate) {
+      counts[which] = count;
+
+      const countEl = document.getElementById(`count-${which}`);
+      countEl.textContent = count;
       if (animate) {
-        el.classList.add('bump');
-        setTimeout(() => el.classList.remove('bump'), 200);
+        countEl.classList.remove('bump');
+        void countEl.offsetWidth;
+        countEl.classList.add('bump');
+        setTimeout(() => countEl.classList.remove('bump'), 200);
+
+        const jarEl = document.getElementById(`jar-${which}`);
+        jarEl.classList.remove('bump');
+        void jarEl.offsetWidth;
+        jarEl.classList.add('bump');
+        setTimeout(() => jarEl.classList.remove('bump'), 350);
+      }
+
+      document.getElementById(`use-${which}`).disabled = count <= 0;
+
+      const jarEl = document.getElementById(`jar-${which}`);
+      const receiverEl = document.getElementById(`receiver-${which}`);
+      if (count >= OVERFLOW) {
+        jarEl.classList.add('overflowing');
+        receiverEl.classList.add('happy');
+      } else {
+        jarEl.classList.remove('overflowing');
+        receiverEl.classList.remove('happy');
       }
     }
 
-    async function action(type) {
+    async function storeHug(which) {
       try {
-        const r = await fetch(`/api/hugs/${type}`, { method: 'POST' });
+        const r = await fetch(`/api/hugs/${which}/store`, { method: 'POST' });
         const { count } = await r.json();
-        updateDisplay(count, true);
+        updateDisplay(which, count, true);
+        const msg = which === 'for-her' ? 'Hug sent to her 💕' : 'Hug sent to him 💕';
+        showMessage(msg);
+        spawnHearts('🤗', 4);
+        if (count >= OVERFLOW) spawnHearts('💕', 5);
+      } catch { showMessage('Something went wrong…'); }
+    }
 
-        if (type === 'store') {
-          showMessage('Hug sent with love 💕');
-          spawnHearts('🤗', 5);
-        } else {
-          if (count === 0) {
-            showMessage('Last hug used, someone top us up! 💌');
-          } else {
-            showMessage(`Hug redeemed, enjoy it 💗`);
-          }
-          spawnHearts('💝', 3);
-        }
-      } catch {
-        showMessage('Something went wrong, try again');
-      }
+    async function useHug(which) {
+      try {
+        const r = await fetch(`/api/hugs/${which}/use`, { method: 'POST' });
+        const { count } = await r.json();
+        updateDisplay(which, count, true);
+        showMessage(count === 0 ? 'Last hug used! Top it up 💌' : 'Hug redeemed 💗');
+        spawnHearts('💝', 3);
+      } catch { showMessage('Something went wrong…'); }
     }
 
     function showMessage(text) {
       const el = document.getElementById('message');
       el.textContent = text;
       clearTimeout(el._t);
-      el._t = setTimeout(() => { el.textContent = ''; }, 3500);
+      el._t = setTimeout(() => { el.textContent = ''; }, 3400);
     }
 
     function spawnHearts(emoji, n) {
-      const container = document.getElementById('hearts');
+      const layer = document.getElementById('float-layer');
       for (let i = 0; i < n; i++) {
         setTimeout(() => {
           const h = document.createElement('span');
-          h.className = 'heart';
+          h.className = 'fheart';
           h.textContent = emoji;
-          h.style.left = (15 + Math.random() * 70) + '%';
-          h.style.bottom = (20 + Math.random() * 30) + '%';
-          h.style.animationDelay = (Math.random() * 0.3) + 's';
-          container.appendChild(h);
-          setTimeout(() => h.remove(), 1600);
-        }, i * 120);
+          h.style.left  = (10 + Math.random() * 80) + '%';
+          h.style.bottom = (20 + Math.random() * 35) + '%';
+          h.style.animationDelay = (Math.random() * 0.25) + 's';
+          layer.appendChild(h);
+          setTimeout(() => h.remove(), 1700);
+        }, i * 110);
       }
     }
 
-    fetchCount();
-    setInterval(fetchCount, 4000);
+    fetchCounts();
+    setInterval(fetchCounts, 4000);
   </script>
 </body>
 </html>

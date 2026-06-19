@@ -94,10 +94,14 @@ CREATE INDEX IF NOT EXISTS idx_players_name   ON game_players(name);
 CREATE INDEX IF NOT EXISTS idx_players_is_bot ON game_players(is_bot);
 
 CREATE TABLE IF NOT EXISTS hugs (
-  id    INT PRIMARY KEY DEFAULT 1,
-  count INT NOT NULL DEFAULT 0
+  id      INT PRIMARY KEY DEFAULT 1,
+  count   INT NOT NULL DEFAULT 0,
+  for_her INT NOT NULL DEFAULT 0,
+  for_him INT NOT NULL DEFAULT 0
 );
-INSERT INTO hugs (id, count) VALUES (1, 0) ON CONFLICT DO NOTHING;
+INSERT INTO hugs (id, count, for_her, for_him) VALUES (1, 0, 0, 0) ON CONFLICT DO NOTHING;
+ALTER TABLE hugs ADD COLUMN IF NOT EXISTS for_her INT NOT NULL DEFAULT 0;
+ALTER TABLE hugs ADD COLUMN IF NOT EXISTS for_him INT NOT NULL DEFAULT 0;
 `;
 
 export async function initDb() {
@@ -230,24 +234,19 @@ export async function gameDetail(id) {
   return { ...g.rows[0], players_list: ppl.rows, rounds_detail: r.rows };
 }
 
-export async function getHugs() {
-  if (!ready) return 0;
-  const { rows } = await pool.query('SELECT count FROM hugs WHERE id = 1');
-  return rows[0]?.count ?? 0;
+const HUG_COLS = new Set(['for_her', 'for_him']);
+
+export async function getHugCounts() {
+  if (!ready) return { forHer: 0, forHim: 0 };
+  const { rows } = await pool.query('SELECT for_her, for_him FROM hugs WHERE id = 1');
+  return { forHer: rows[0]?.for_her ?? 0, forHim: rows[0]?.for_him ?? 0 };
 }
 
-export async function storeHug() {
-  if (!ready) return null;
+export async function changeHug(col, delta) {
+  if (!ready || !HUG_COLS.has(col)) return null;
   const { rows } = await pool.query(
-    'UPDATE hugs SET count = count + 1 WHERE id = 1 RETURNING count'
-  );
-  return rows[0]?.count ?? null;
-}
-
-export async function useHug() {
-  if (!ready) return null;
-  const { rows } = await pool.query(
-    'UPDATE hugs SET count = GREATEST(count - 1, 0) WHERE id = 1 RETURNING count'
+    `UPDATE hugs SET ${col} = GREATEST(${col} + $1, 0) WHERE id = 1 RETURNING ${col} AS count`,
+    [delta]
   );
   return rows[0]?.count ?? null;
 }
