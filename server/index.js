@@ -9,7 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WebSocketServer } from 'ws';
 import { RoomManager } from './rooms.js';
-import { initDb, recentGames, gameDetail, stats } from './db.js';
+import { initDb, recentGames, gameDetail, stats, getHugs, storeHug, useHug } from './db.js';
 import { CONFIG } from './constants.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -38,6 +38,9 @@ async function handleApi(req, res, urlPath, query) {
   try {
     if (urlPath === '/api/live') return sendJson(res, 200, manager.liveSummary());
     if (urlPath === '/api/stats') return sendJson(res, 200, await stats());
+    if (urlPath === '/api/hugs' && req.method === 'GET') return sendJson(res, 200, { count: await getHugs() });
+    if (urlPath === '/api/hugs/store' && req.method === 'POST') return sendJson(res, 200, { count: await storeHug() });
+    if (urlPath === '/api/hugs/use' && req.method === 'POST') return sendJson(res, 200, { count: await useHug() });
     if (urlPath === '/api/games') {
       const limit = parseInt(query.get('limit'), 10) || 20;
       return sendJson(res, 200, await recentGames(limit));
@@ -60,6 +63,7 @@ const server = http.createServer((req, res) => {
 
   if (urlPath.startsWith('/api/')) { handleApi(req, res, urlPath, parsed.searchParams); return; }
   if (urlPath === '/') urlPath = '/index.html';
+  if (urlPath === '/for-us') urlPath = '/for-us.html';
 
   const filePath = path.normalize(path.join(PUBLIC_DIR, urlPath));
   if (!filePath.startsWith(PUBLIC_DIR)) { // path-traversal guard

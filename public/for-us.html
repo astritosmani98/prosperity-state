@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Hug Jar</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ffe4ec 0%, #ffd6e8 50%, #fce4f3 100%);
+      font-family: 'Georgia', serif;
+      padding: 2rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 200, 220, 0.5);
+      border-radius: 2rem;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(220, 100, 140, 0.12);
+    }
+
+    .jar {
+      font-size: 5rem;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      display: block;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    h1 {
+      color: #c45f80;
+      font-size: 1.6rem;
+      font-weight: normal;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      color: #d48fa8;
+      font-size: 0.9rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .counter-wrap {
+      margin-bottom: 2.5rem;
+    }
+
+    .counter {
+      font-size: 5.5rem;
+      font-weight: bold;
+      color: #c45f80;
+      line-height: 1;
+      transition: transform 0.15s ease;
+    }
+
+    .counter.bump {
+      transform: scale(1.25);
+    }
+
+    .counter-label {
+      font-size: 1rem;
+      color: #d48fa8;
+      margin-top: 0.4rem;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 1.2rem;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .btn:active { transform: scale(0.96); }
+
+    .btn-store {
+      background: linear-gradient(135deg, #f0829e, #e8607f);
+      color: white;
+      box-shadow: 0 4px 16px rgba(220, 80, 120, 0.3);
+    }
+
+    .btn-store:hover {
+      box-shadow: 0 6px 20px rgba(220, 80, 120, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-use {
+      background: white;
+      color: #c45f80;
+      border: 2px solid #f0a8bc;
+      box-shadow: 0 2px 8px rgba(220, 100, 140, 0.1);
+    }
+
+    .btn-use:hover {
+      background: #fff0f5;
+      transform: translateY(-1px);
+    }
+
+    .btn-use:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .message {
+      margin-top: 1.2rem;
+      min-height: 1.5rem;
+      font-size: 0.9rem;
+      color: #d48fa8;
+      font-style: italic;
+      transition: opacity 0.3s ease;
+    }
+
+    .hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: rise 1.4s ease-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes rise {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-200px) scale(0.5); }
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <div class="card">
+    <span class="jar">🫙</span>
+    <h1>Our Hug Jar</h1>
+    <p class="subtitle">a little something for when we're apart</p>
+
+    <div class="counter-wrap">
+      <div class="counter" id="counter">...</div>
+      <div class="counter-label">hugs saved up</div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn btn-store" onclick="action('store')">🤗 Send a hug</button>
+      <button class="btn btn-use" id="btn-use" onclick="action('use')">💝 Use a hug</button>
+    </div>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    let currentCount = null;
+
+    async function fetchCount() {
+      try {
+        const r = await fetch('/api/hugs');
+        const { count } = await r.json();
+        updateDisplay(count, false);
+      } catch { /* silent */ }
+    }
+
+    function updateDisplay(count, animate) {
+      currentCount = count;
+      const el = document.getElementById('counter');
+      el.textContent = count;
+      document.getElementById('btn-use').disabled = count <= 0;
+      if (animate) {
+        el.classList.add('bump');
+        setTimeout(() => el.classList.remove('bump'), 200);
+      }
+    }
+
+    async function action(type) {
+      try {
+        const r = await fetch(`/api/hugs/${type}`, { method: 'POST' });
+        const { count } = await r.json();
+        updateDisplay(count, true);
+
+        if (type === 'store') {
+          showMessage('Hug sent with love 💕');
+          spawnHearts('🤗', 5);
+        } else {
+          if (count === 0) {
+            showMessage('Last hug used, someone top us up! 💌');
+          } else {
+            showMessage(`Hug redeemed, enjoy it 💗`);
+          }
+          spawnHearts('💝', 3);
+        }
+      } catch {
+        showMessage('Something went wrong, try again');
+      }
+    }
+
+    function showMessage(text) {
+      const el = document.getElementById('message');
+      el.textContent = text;
+      clearTimeout(el._t);
+      el._t = setTimeout(() => { el.textContent = ''; }, 3500);
+    }
+
+    function spawnHearts(emoji, n) {
+      const container = document.getElementById('hearts');
+      for (let i = 0; i < n; i++) {
+        setTimeout(() => {
+          const h = document.createElement('span');
+          h.className = 'heart';
+          h.textContent = emoji;
+          h.style.left = (15 + Math.random() * 70) + '%';
+          h.style.bottom = (20 + Math.random() * 30) + '%';
+          h.style.animationDelay = (Math.random() * 0.3) + 's';
+          container.appendChild(h);
+          setTimeout(() => h.remove(), 1600);
+        }, i * 120);
+      }
+    }
+
+    fetchCount();
+    setInterval(fetchCount, 4000);
+  </script>
+</body>
+</html>

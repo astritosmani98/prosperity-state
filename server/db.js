@@ -92,6 +92,12 @@ CREATE INDEX IF NOT EXISTS idx_rounds_game    ON game_rounds(game_id);
 CREATE INDEX IF NOT EXISTS idx_players_game   ON game_players(game_id);
 CREATE INDEX IF NOT EXISTS idx_players_name   ON game_players(name);
 CREATE INDEX IF NOT EXISTS idx_players_is_bot ON game_players(is_bot);
+
+CREATE TABLE IF NOT EXISTS hugs (
+  id    INT PRIMARY KEY DEFAULT 1,
+  count INT NOT NULL DEFAULT 0
+);
+INSERT INTO hugs (id, count) VALUES (1, 0) ON CONFLICT DO NOTHING;
 `;
 
 export async function initDb() {
@@ -222,6 +228,28 @@ export async function gameDetail(id) {
   );
   const r = await pool.query('SELECT * FROM game_rounds WHERE game_id = $1 ORDER BY round', [id]);
   return { ...g.rows[0], players_list: ppl.rows, rounds_detail: r.rows };
+}
+
+export async function getHugs() {
+  if (!ready) return 0;
+  const { rows } = await pool.query('SELECT count FROM hugs WHERE id = 1');
+  return rows[0]?.count ?? 0;
+}
+
+export async function storeHug() {
+  if (!ready) return null;
+  const { rows } = await pool.query(
+    'UPDATE hugs SET count = count + 1 WHERE id = 1 RETURNING count'
+  );
+  return rows[0]?.count ?? null;
+}
+
+export async function useHug() {
+  if (!ready) return null;
+  const { rows } = await pool.query(
+    'UPDATE hugs SET count = GREATEST(count - 1, 0) WHERE id = 1 RETURNING count'
+  );
+  return rows[0]?.count ?? null;
 }
 
 export async function stats() {
