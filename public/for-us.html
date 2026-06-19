@@ -8,7 +8,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Georgia', serif; }
 
-    /* ── Nature background ── */
     .bg {
       position: fixed; inset: 0;
       background: linear-gradient(180deg,
@@ -18,7 +17,6 @@
     }
     .bg-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-    /* ── Stage ── */
     .stage {
       position: fixed; inset: 0;
       display: flex;
@@ -27,7 +25,6 @@
       padding-bottom: 1rem;
     }
 
-    /* ── Each character side ── */
     .side {
       display: flex;
       flex-direction: column;
@@ -41,10 +38,9 @@
       height: clamp(210px, 56vh, 400px);
       width: auto;
       display: block;
-      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.18));
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
     }
 
-    /* ── Buttons ── */
     .btns { display: flex; flex-direction: column; gap: 0.4rem; align-items: center; }
 
     .btn {
@@ -72,7 +68,6 @@
     .btn-use:hover { background: rgba(255,255,255,0.92); }
     .btn-use:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
 
-    /* ── Message toast ── */
     #msg {
       position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%);
       background: rgba(255,255,255,0.8); backdrop-filter: blur(8px);
@@ -83,7 +78,6 @@
     }
     #msg.show { opacity: 1; }
 
-    /* ── Flying hearts layer ── */
     #fly { position: fixed; inset: 0; pointer-events: none; z-index: 99; }
 
     @keyframes burstUp {
@@ -95,7 +89,7 @@
 </head>
 <body>
 
-<!-- ═══ BACKGROUND SCENE ═══ -->
+<!-- ═══ BACKGROUND ═══ -->
 <div class="bg">
   <svg class="bg-svg" viewBox="0 0 800 560" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -113,16 +107,10 @@
         <stop offset="100%" stop-color="#ffc000" stop-opacity="0"/>
       </radialGradient>
     </defs>
-
-    <!-- Sky -->
     <rect width="800" height="560" fill="url(#gSky)"/>
-
-    <!-- Sun + glow -->
     <circle cx="660" cy="85" r="90" fill="url(#gSun)" opacity="0.55"/>
     <circle cx="660" cy="85" r="52" fill="#ffd820"/>
     <circle cx="660" cy="85" r="44" fill="#ffe040"/>
-
-    <!-- Clouds -->
     <g opacity="0.9">
       <ellipse cx="130" cy="88" rx="70" ry="32" fill="white"/>
       <ellipse cx="170" cy="72" rx="55" ry="38" fill="white"/>
@@ -133,70 +121,47 @@
       <ellipse cx="525" cy="104" rx="48" ry="34" fill="white"/>
       <ellipse cx="440" cy="112" rx="38" ry="24" fill="white"/>
     </g>
-
-    <!-- Birds -->
     <g stroke="#6090c0" stroke-width="2.2" fill="none" opacity="0.55">
-      <path d="M295 138 Q301 132 307 138"/>
-      <path d="M313 130 Q319 124 325 130"/>
-      <path d="M560 78 Q566 72 572 78"/>
-      <path d="M575 86 Q579 81 583 86"/>
+      <path d="M295 138 Q301 132 307 138"/><path d="M313 130 Q319 124 325 130"/>
+      <path d="M560 78 Q566 72 572 78"/><path d="M575 86 Q579 81 583 86"/>
     </g>
-
-    <!-- Ground -->
     <rect x="0" y="212" width="800" height="348" fill="url(#gGround)"/>
-    <!-- Horizon blend -->
     <ellipse cx="400" cy="212" rx="520" ry="44" fill="#8ad84c"/>
-
-    <!-- Rolling hills (back) -->
     <ellipse cx="200" cy="220" rx="300" ry="88" fill="#70c038" opacity="0.6"/>
     <ellipse cx="620" cy="228" rx="280" ry="80" fill="#70c038" opacity="0.5"/>
-
-    <!-- Left trees -->
     <rect x="118" y="168" width="16" height="88" rx="4" fill="#7a5020"/>
     <ellipse cx="126" cy="152" rx="52" ry="66" fill="#288018"/>
     <ellipse cx="126" cy="124" rx="38" ry="52" fill="#34941e"/>
     <ellipse cx="126" cy="104" rx="26" ry="36" fill="#42aa28"/>
-
     <rect x="172" y="190" width="13" height="72" rx="4" fill="#7a5020"/>
     <ellipse cx="178" cy="176" rx="42" ry="54" fill="#248018"/>
     <ellipse cx="178" cy="153" rx="30" ry="40" fill="#308c1c"/>
-
-    <!-- Right trees -->
     <rect x="660" y="168" width="16" height="88" rx="4" fill="#7a5020"/>
     <ellipse cx="668" cy="152" rx="52" ry="66" fill="#288018"/>
     <ellipse cx="668" cy="124" rx="38" ry="52" fill="#34941e"/>
     <ellipse cx="668" cy="104" rx="26" ry="36" fill="#42aa28"/>
-
     <rect x="610" y="190" width="13" height="72" rx="4" fill="#7a5020"/>
     <ellipse cx="616" cy="176" rx="42" ry="54" fill="#248018"/>
     <ellipse cx="616" cy="153" rx="30" ry="40" fill="#308c1c"/>
-
-    <!-- Flowers scattered across ground -->
     <g>
       <circle cx="264" cy="222" r="5.5" fill="#ff5888"/><circle cx="264" cy="222" r="2.5" fill="#fff0a0"/>
       <circle cx="280" cy="216" r="4.5" fill="#ff90c0"/><circle cx="280" cy="216" r="2" fill="white"/>
       <circle cx="296" cy="224" r="5"   fill="#ffdd30"/><circle cx="296" cy="224" r="2.5" fill="white"/>
       <circle cx="248" cy="226" r="4"   fill="#ff5888"/><circle cx="248" cy="226" r="1.8" fill="#fff0a0"/>
       <circle cx="312" cy="218" r="5"   fill="#ff90c0"/><circle cx="312" cy="218" r="2.2" fill="white"/>
-
       <circle cx="488" cy="222" r="5.5" fill="#ff5888"/><circle cx="488" cy="222" r="2.5" fill="#fff0a0"/>
       <circle cx="505" cy="216" r="4.5" fill="#ffdd30"/><circle cx="505" cy="216" r="2" fill="white"/>
       <circle cx="521" cy="224" r="5"   fill="#ff90c0"/><circle cx="521" cy="224" r="2.2" fill="white"/>
       <circle cx="474" cy="220" r="4"   fill="#ff5888"/><circle cx="474" cy="220" r="1.8" fill="#fff0a0"/>
       <circle cx="537" cy="218" r="5"   fill="#ffdd30"/><circle cx="537" cy="218" r="2.2" fill="white"/>
-
       <circle cx="376" cy="224" r="5"   fill="#ff90c0"/><circle cx="376" cy="224" r="2.2" fill="white"/>
       <circle cx="393" cy="218" r="4.5" fill="#ffdd30"/><circle cx="393" cy="218" r="2" fill="white"/>
       <circle cx="411" cy="225" r="5"   fill="#ff5888"/><circle cx="411" cy="225" r="2.5" fill="#fff0a0"/>
     </g>
-
-    <!-- Grass blades -->
     <g stroke="#50a828" stroke-width="2.2" fill="none" opacity="0.7">
       <path d="M345 222 Q347 208 344 196"/><path d="M352 224 Q355 211 354 198"/><path d="M359 221 Q360 209 358 198"/>
       <path d="M440 222 Q442 208 440 196"/><path d="M447 224 Q450 211 449 198"/><path d="M454 221 Q455 209 453 198"/>
     </g>
-
-    <!-- Path/dirt between characters -->
     <ellipse cx="400" cy="260" rx="90" ry="16" fill="#c8a060" opacity="0.35"/>
   </svg>
 </div>
@@ -204,31 +169,36 @@
 <!-- ═══ STAGE ═══ -->
 <div class="stage">
 
-  <!-- ── BOY (left) holds jar FOR HER ── -->
+  <!-- ══ BOY — Izuku Midoriya style ══ -->
   <div class="side" id="boy-side">
     <svg id="boy-svg" class="char-svg" viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg">
 
-      <!-- Legs -->
-      <rect x="44" y="196" width="26" height="72" rx="8" fill="#3a5888"/>
-      <rect x="76" y="196" width="26" height="72" rx="8" fill="#3a5888"/>
-      <!-- Shoes -->
-      <ellipse cx="57"  cy="268" rx="18" ry="9" fill="#1a1a2a"/>
-      <ellipse cx="89"  cy="268" rx="18" ry="9" fill="#1a1a2a"/>
+      <!-- Red shoes (Izuku's red shoes) -->
+      <ellipse cx="55"  cy="272" rx="19" ry="8" fill="#b82020"/>
+      <ellipse cx="89"  cy="272" rx="19" ry="8" fill="#b82020"/>
 
-      <!-- Body / shirt -->
-      <rect x="28" y="118" width="88" height="84" rx="14" fill="#5878b0"/>
+      <!-- Legs (dark grey-green suit) -->
+      <rect x="42" y="196" width="26" height="76" rx="7" fill="#2a3c28"/>
+      <rect x="74" y="196" width="26" height="76" rx="7" fill="#2a3c28"/>
 
-      <!-- Left arm (down, relaxed) -->
-      <rect x="8"  y="124" width="24" height="62" rx="10" fill="#5878b0"/>
-      <ellipse cx="20" cy="190" rx="13" ry="11" fill="#fcdcb8"/>
+      <!-- Body — dark green hero suit -->
+      <rect x="24" y="118" width="92" height="84" rx="14" fill="#2a3c28"/>
+      <!-- Suit white belt + chest stripe -->
+      <rect x="24" y="168" width="92" height="8"  rx="4" fill="#e0e0d0" opacity="0.55"/>
+      <rect x="52" y="122" width="36" height="5"  rx="2" fill="#e0e0d0" opacity="0.4"/>
+      <!-- Red elbow pads (hero suit detail) -->
+      <ellipse cx="24"  cy="152" rx="9" ry="7" fill="#c02020" opacity="0.75"/>
+      <ellipse cx="116" cy="152" rx="9" ry="7" fill="#c02020" opacity="0.75"/>
 
-      <!-- Right arm (extended toward center, holding jar) -->
-      <!-- Upper arm -->
-      <rect x="112" y="120" width="22" height="48" rx="9" fill="#5878b0" transform="rotate(28,123,144)"/>
-      <!-- Lower arm / hand -->
-      <ellipse cx="148" cy="168" rx="13" ry="11" fill="#fcdcb8"/>
+      <!-- Left arm (relaxed at side) -->
+      <rect x="6"  y="124" width="22" height="58" rx="9" fill="#2a3c28"/>
+      <ellipse cx="17" cy="187" rx="12" ry="10" fill="#fcdcb8"/>
 
-      <!-- JAR in right hand (SVG coords ~120-158, 155-215) -->
+      <!-- Right arm (extended toward jar, slightly rotated) -->
+      <rect x="112" y="120" width="21" height="50" rx="9" fill="#2a3c28" transform="rotate(26,122,145)"/>
+      <ellipse cx="148" cy="170" rx="12" ry="10" fill="#fcdcb8"/>
+
+      <!-- JAR in right hand -->
       <defs>
         <linearGradient id="jbg" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#d8f0ff" stop-opacity="0.92"/>
@@ -236,97 +206,120 @@
         </linearGradient>
         <clipPath id="jbc"><rect x="122" y="168" width="38" height="50" rx="7"/></clipPath>
       </defs>
-      <!-- Fill level (rises as count grows) -->
-      <rect id="boy-jar-fill" x="123" y="196" width="36" height="20" clip-path="url(#jbc)" fill="#ffaac8" opacity="0.55"/>
-      <!-- Jar glass -->
+      <rect id="boy-jar-fill" x="123" y="216" width="36" height="0" clip-path="url(#jbc)" fill="#ffaac8" opacity="0.6"/>
       <rect x="122" y="168" width="38" height="50" rx="7" fill="url(#jbg)" stroke="#78b0d0" stroke-width="1.8"/>
-      <!-- Jar lid -->
       <rect x="118" y="160" width="46" height="12" rx="5" fill="#78b0d0"/>
-      <!-- Glass shine -->
-      <rect x="126" y="173" width="9" height="24" rx="3" fill="white" opacity="0.32"/>
-      <!-- Count text -->
-      <text id="count-for-her" x="141" y="202" text-anchor="middle" dominant-baseline="middle"
-            font-size="15" font-weight="bold" font-family="Georgia,serif" fill="#4060a0">0</text>
-      <!-- Overflow hearts spilling out -->
+      <rect x="126" y="173" width="9"  height="24" rx="3" fill="white" opacity="0.3"/>
+      <text id="count-for-her" x="141" y="197" text-anchor="middle" dominant-baseline="middle"
+            font-size="15" font-weight="bold" font-family="Georgia,serif" fill="#3a5888">0</text>
       <g id="overflow-for-her" display="none">
-        <text x="130" y="154" font-size="11">💕</text>
-        <text x="143" y="147" font-size="10">💕</text>
-        <text x="120" y="149" font-size="9">💕</text>
+        <text x="128" y="154" font-size="11">💕</text>
+        <text x="141" y="147" font-size="10">💕</text>
+        <text x="120" y="150" font-size="9">💕</text>
       </g>
 
       <!-- Neck -->
-      <rect x="59" y="104" width="24" height="18" rx="5" fill="#fcdcb8"/>
+      <rect x="58" y="104" width="24" height="18" rx="5" fill="#fcdcb8"/>
 
-      <!-- Head (face) -->
-      <ellipse cx="71" cy="68" rx="42" ry="44" fill="#fcdcb8"/>
+      <!-- Ear (behind face) -->
+      <ellipse cx="27"  cy="74" rx="7" ry="10" fill="#fcdcb8"/>
+      <ellipse cx="113" cy="74" rx="7" ry="10" fill="#fcdcb8"/>
 
-      <!-- Hair – black, short -->
-      <ellipse cx="71" cy="35" rx="42" ry="28" fill="#1a1a1a"/>
-      <rect x="29" y="38" width="84" height="20" fill="#1a1a1a"/>
-      <path d="M29 52 Q38 42 46 48" fill="#1a1a1a"/>
-      <path d="M113 52 Q104 42 96 48" fill="#1a1a1a"/>
+      <!-- Face -->
+      <ellipse cx="70" cy="72" rx="43" ry="46" fill="#fcdcb8"/>
 
-      <!-- Ears -->
-      <ellipse cx="29" cy="70" rx="8" ry="11" fill="#fcdcb8"/>
-      <ellipse cx="113" cy="70" rx="8" ry="11" fill="#fcdcb8"/>
+      <!-- ── IZUKU HAIR (spiky, very dark green-black) ── -->
+      <!-- Base hair covering forehead -->
+      <rect x="27" y="38" width="86" height="22" fill="#1e2416"/>
+      <ellipse cx="70" cy="38" rx="43" ry="20" fill="#1e2416"/>
+      <!-- Spikes going upward (messy, irregular) -->
+      <path d="M33 38 Q26 22 30 8  Q37 20 40 38"  fill="#1e2416"/>
+      <path d="M46 32 Q40 14 46 2  Q54 16 54 34"  fill="#1e2416"/>
+      <path d="M59 27 Q56 6  62 -4 Q70 8  68 30"  fill="#1e2416"/>
+      <path d="M74 26 Q74 4  80 -3 Q86 10 84 29"  fill="#1e2416"/>
+      <path d="M88 30 Q92 12 99 8  Q100 22 96 36" fill="#1e2416"/>
+      <path d="M100 36 Q108 20 113 18 Q112 32 106 42" fill="#1e2416"/>
+      <!-- Side hair covering ears -->
+      <ellipse cx="27"  cy="60" rx="8" ry="20" fill="#1e2416"/>
+      <ellipse cx="113" cy="60" rx="8" ry="20" fill="#1e2416"/>
+      <!-- Forehead strands hanging down -->
+      <path d="M52 44 Q49 54 51 62" stroke="#1e2416" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M63 44 Q59 52 61 59" stroke="#1e2416" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Hair fill behind spikes -->
+      <ellipse cx="70" cy="16" rx="35" ry="20" fill="#1e2416"/>
 
-      <!-- Eyes normal -->
+      <!-- Freckles (permanent, 3 dots each cheek) -->
+      <circle cx="44" cy="78" r="2.2" fill="#c87840" opacity="0.65"/>
+      <circle cx="38" cy="83" r="2"   fill="#c87840" opacity="0.6"/>
+      <circle cx="46" cy="87" r="1.8" fill="#c87840" opacity="0.55"/>
+      <circle cx="96" cy="78" r="2.2" fill="#c87840" opacity="0.65"/>
+      <circle cx="102" cy="83" r="2"  fill="#c87840" opacity="0.6"/>
+      <circle cx="94" cy="87" r="1.8" fill="#c87840" opacity="0.55"/>
+
+      <!-- Eyes normal (green, determined) -->
       <g id="bn">
-        <ellipse cx="55"  cy="68" rx="7" ry="8.5" fill="#222"/>
-        <ellipse cx="87"  cy="68" rx="7" ry="8.5" fill="#222"/>
-        <circle  cx="57.5" cy="65" r="2.5" fill="white"/>
-        <circle  cx="89.5" cy="65" r="2.5" fill="white"/>
-        <circle  cx="59.5" cy="63" r="1"   fill="white"/>
-        <circle  cx="91.5" cy="63" r="1"   fill="white"/>
+        <ellipse cx="54"  cy="70" rx="8"   ry="9.5" fill="#1a4a18"/>
+        <ellipse cx="86"  cy="70" rx="8"   ry="9.5" fill="#1a4a18"/>
+        <ellipse cx="54"  cy="70" rx="5.5" ry="7"   fill="#2a8a2a"/>
+        <ellipse cx="86"  cy="70" rx="5.5" ry="7"   fill="#2a8a2a"/>
+        <circle  cx="57"  cy="66" r="2.8"  fill="white"/>
+        <circle  cx="89"  cy="66" r="2.8"  fill="white"/>
+        <circle  cx="59.5" cy="64" r="1.1" fill="white"/>
+        <circle  cx="91.5" cy="64" r="1.1" fill="white"/>
       </g>
-      <!-- Eyes happy -->
+      <!-- Eyes happy (curved, joyful) -->
       <g id="bh" display="none">
-        <path d="M48 68 Q55 60 62 68" stroke="#222" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-        <path d="M80 68 Q87 60 94 68" stroke="#222" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+        <path d="M46 70 Q54 61 62 70" stroke="#1a4a18" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+        <path d="M78 70 Q86 61 94 70" stroke="#1a4a18" stroke-width="3.4" fill="none" stroke-linecap="round"/>
       </g>
 
-      <!-- Mouth normal -->
-      <path id="bm-n" d="M61 84 Q71 91 81 84" stroke="#c07858" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-      <!-- Mouth happy -->
-      <path id="bm-h" d="M56 82 Q71 98 86 82" stroke="#c07858" stroke-width="2.5" fill="#ffb09a" stroke-linecap="round" display="none"/>
+      <!-- Mouth normal (small confident smile) -->
+      <path id="bm-n" d="M60 87 Q70 94 80 87" stroke="#b87050" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- Mouth happy (big grin) -->
+      <path id="bm-h" d="M54 85 Q70 101 86 85" stroke="#b87050" stroke-width="2.5" fill="#ffb09a" stroke-linecap="round" display="none"/>
 
-      <!-- Blush -->
-      <ellipse id="bb-l" cx="38"  cy="78" rx="10" ry="6" fill="#ffb3c1" opacity="0.7" display="none"/>
-      <ellipse id="bb-r" cx="104" cy="78" rx="10" ry="6" fill="#ffb3c1" opacity="0.7" display="none"/>
+      <!-- Blush (happy only) -->
+      <ellipse id="bb-l" cx="36"  cy="82" rx="10" ry="6" fill="#ffb3c1" opacity="0.7" display="none"/>
+      <ellipse id="bb-r" cx="104" cy="82" rx="10" ry="6" fill="#ffb3c1" opacity="0.7" display="none"/>
     </svg>
 
     <div class="btns">
       <button class="btn btn-send" onclick="storeHug('for-her')">🤗 Send her a hug</button>
-      <button class="btn btn-use" id="use-for-her" onclick="useHug('for-her')">💝 She uses a hug</button>
+      <button class="btn btn-use" id="use-for-him" onclick="useHug('for-him')">💝 Use a hug</button>
     </div>
   </div>
 
-  <!-- ── GIRL (right) holds jar FOR HIM ── -->
+  <!-- ══ GIRL — Uraraka style, blonde hair ══ -->
   <div class="side" id="girl-side">
     <svg id="girl-svg" class="char-svg" viewBox="0 0 160 280" xmlns="http://www.w3.org/2000/svg">
 
-      <!-- Long blonde hair (behind everything) -->
-      <ellipse cx="89" cy="165" rx="50" ry="100" fill="#f0c030"/>
+      <!-- Shoes (dark, rounded) -->
+      <ellipse cx="71"  cy="272" rx="19" ry="8" fill="#2a2a3a"/>
+      <ellipse cx="105" cy="272" rx="19" ry="8" fill="#2a2a3a"/>
 
-      <!-- Legs -->
-      <rect x="58" y="196" width="26" height="72" rx="8" fill="#e080c0"/>
-      <rect x="90" y="196" width="26" height="72" rx="8" fill="#e080c0"/>
-      <!-- Shoes -->
-      <ellipse cx="71"  cy="268" rx="18" ry="9" fill="#c05080"/>
-      <ellipse cx="103" cy="268" rx="18" ry="9" fill="#c05080"/>
+      <!-- Legs (white/light suit) -->
+      <rect x="58" y="196" width="26" height="76" rx="7" fill="#d8d8e8"/>
+      <rect x="90" y="196" width="26" height="76" rx="7" fill="#d8d8e8"/>
 
-      <!-- Body / dress -->
-      <rect x="32" y="118" width="96" height="84" rx="14" fill="#e890c8"/>
+      <!-- Body — Uraraka white/pink hero suit -->
+      <rect x="28" y="118" width="100" height="84" rx="14" fill="#e8e8f4"/>
+      <!-- Pink accent stripe + buttons -->
+      <rect x="28" y="118" width="100" height="10" rx="7" fill="#f080b8" opacity="0.7"/>
+      <rect x="28" y="186" width="100" height="8"  rx="4" fill="#f080b8" opacity="0.5"/>
+      <!-- Pink buttons down center -->
+      <circle cx="78" cy="140" r="4" fill="#f080b8" opacity="0.8"/>
+      <circle cx="78" cy="155" r="4" fill="#f080b8" opacity="0.8"/>
+      <circle cx="78" cy="170" r="4" fill="#f080b8" opacity="0.8"/>
 
-      <!-- Right arm (down, relaxed) -->
-      <rect x="128" y="124" width="24" height="62" rx="10" fill="#e890c8"/>
-      <ellipse cx="140" cy="190" rx="13" ry="11" fill="#fcdcb8"/>
+      <!-- Right arm (relaxed at side) -->
+      <rect x="126" y="124" width="22" height="58" rx="9" fill="#e8e8f4"/>
+      <ellipse cx="137" cy="187" rx="12" ry="10" fill="#fcdcb8"/>
 
-      <!-- Left arm (extended toward center, holding jar) -->
-      <rect x="18" y="120" width="22" height="48" rx="9" fill="#e890c8" transform="rotate(-28,29,144)"/>
-      <ellipse cx="12" cy="168" rx="13" ry="11" fill="#fcdcb8"/>
+      <!-- Left arm (extended toward jar, slightly rotated) -->
+      <rect x="18" y="120" width="21" height="50" rx="9" fill="#e8e8f4" transform="rotate(-26,29,145)"/>
+      <ellipse cx="12" cy="170" rx="12" ry="10" fill="#fcdcb8"/>
 
-      <!-- JAR in left hand (SVG coords ~2-40, 155-215) -->
+      <!-- JAR in left hand -->
       <defs>
         <linearGradient id="jgg" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="#ffe8f8" stop-opacity="0.92"/>
@@ -334,74 +327,89 @@
         </linearGradient>
         <clipPath id="jgc"><rect x="0" y="168" width="38" height="50" rx="7"/></clipPath>
       </defs>
-      <rect id="girl-jar-fill" x="1" y="196" width="36" height="20" clip-path="url(#jgc)" fill="#f090c0" opacity="0.55"/>
+      <rect id="girl-jar-fill" x="1" y="216" width="36" height="0" clip-path="url(#jgc)" fill="#f090c0" opacity="0.6"/>
       <rect x="0" y="168" width="38" height="50" rx="7" fill="url(#jgg)" stroke="#d890c8" stroke-width="1.8"/>
       <rect x="-4" y="160" width="46" height="12" rx="5" fill="#d890c8"/>
-      <rect x="4" y="173" width="9" height="24" rx="3" fill="white" opacity="0.32"/>
-      <text id="count-for-him" x="19" y="202" text-anchor="middle" dominant-baseline="middle"
+      <rect x="4" y="173" width="9"  height="24" rx="3" fill="white" opacity="0.3"/>
+      <text id="count-for-him" x="19" y="197" text-anchor="middle" dominant-baseline="middle"
             font-size="15" font-weight="bold" font-family="Georgia,serif" fill="#a04090">0</text>
       <g id="overflow-for-him" display="none">
-        <text x="4"  y="154" font-size="11">💕</text>
-        <text x="17" y="147" font-size="10">💕</text>
-        <text x="-5" y="149" font-size="9">💕</text>
+        <text x="2"  y="154" font-size="11">💕</text>
+        <text x="15" y="147" font-size="10">💕</text>
+        <text x="-6" y="150" font-size="9">💕</text>
       </g>
 
       <!-- Neck -->
-      <rect x="77" y="104" width="24" height="18" rx="5" fill="#fcdcb8"/>
+      <rect x="75" y="104" width="24" height="18" rx="5" fill="#fcdcb8"/>
 
-      <!-- Head (face) -->
-      <ellipse cx="89" cy="68" rx="42" ry="44" fill="#fcdcb8"/>
+      <!-- Ear (behind face) -->
+      <ellipse cx="45"  cy="74" rx="7" ry="10" fill="#fcdcb8"/>
+      <ellipse cx="133" cy="74" rx="7" ry="10" fill="#fcdcb8"/>
 
-      <!-- Hair – blonde, top -->
-      <ellipse cx="89" cy="34" rx="42" ry="28" fill="#f0c030"/>
-      <rect x="47" y="37" width="84" height="20" fill="#f0c030"/>
-      <!-- Highlight -->
-      <ellipse cx="81" cy="30" rx="15" ry="8" fill="#f8d848" opacity="0.5"/>
-      <!-- Side strands -->
-      <ellipse cx="47"  cy="66" rx="13" ry="32" fill="#f0c030"/>
-      <ellipse cx="131" cy="66" rx="13" ry="32" fill="#f0c030"/>
+      <!-- Face (rounder, Uraraka style) -->
+      <ellipse cx="89" cy="72" rx="44" ry="46" fill="#fcdcb8"/>
 
-      <!-- Ears -->
-      <ellipse cx="47"  cy="70" rx="8" ry="11" fill="#fcdcb8"/>
-      <ellipse cx="131" cy="70" rx="8" ry="11" fill="#fcdcb8"/>
+      <!-- ── URARAKA HAIR (blonde, with signature twin tufts) ── -->
+      <!-- Main hair base -->
+      <ellipse cx="89" cy="44" rx="44" ry="22" fill="#f0c030"/>
+      <rect x="45" y="46" width="88" height="14" fill="#f0c030"/>
+      <!-- Left signature tuft / bump -->
+      <ellipse cx="64" cy="20" rx="13" ry="20" fill="#f0c030"/>
+      <path d="M58 38 Q52 28 54 14 Q62 18 68 36" fill="#f0c030"/>
+      <!-- Right signature tuft / bump -->
+      <ellipse cx="114" cy="20" rx="13" ry="20" fill="#f0c030"/>
+      <path d="M120 38 Q126 28 124 14 Q116 18 110 36" fill="#f0c030"/>
+      <!-- Hair highlight / shine -->
+      <ellipse cx="76"  cy="16" rx="6" ry="8" fill="#f8e060" opacity="0.45"/>
+      <ellipse cx="106" cy="16" rx="6" ry="8" fill="#f8e060" opacity="0.45"/>
+      <!-- Side hair at temples -->
+      <ellipse cx="45"  cy="64" rx="10" ry="22" fill="#f0c030"/>
+      <ellipse cx="133" cy="64" rx="10" ry="22" fill="#f0c030"/>
+      <!-- Small strand curl on cheeks -->
+      <path d="M50 80 Q44 90 46 96" stroke="#f0c030" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M128 80 Q134 90 132 96" stroke="#f0c030" stroke-width="5" fill="none" stroke-linecap="round"/>
 
-      <!-- Eyes normal (bigger, sparkly, anime) -->
+      <!-- Eyes normal (Uraraka's big warm brown eyes) -->
       <g id="gn">
-        <ellipse cx="73"  cy="68" rx="9"   ry="10.5" fill="#4a3090"/>
-        <ellipse cx="105" cy="68" rx="9"   ry="10.5" fill="#4a3090"/>
-        <ellipse cx="73"  cy="68" rx="6.5" ry="7.8"  fill="#6a52c0"/>
-        <ellipse cx="105" cy="68" rx="6.5" ry="7.8"  fill="#6a52c0"/>
-        <circle  cx="76"  cy="63" r="3"   fill="white"/>
-        <circle  cx="108" cy="63" r="3"   fill="white"/>
-        <circle  cx="78.5" cy="61" r="1.2" fill="white"/>
-        <circle  cx="110.5" cy="61" r="1.2" fill="white"/>
+        <ellipse cx="73"  cy="70" rx="10"  ry="11.5" fill="#3d2010"/>
+        <ellipse cx="105" cy="70" rx="10"  ry="11.5" fill="#3d2010"/>
+        <ellipse cx="73"  cy="70" rx="7"   ry="8.5"  fill="#7a4820"/>
+        <ellipse cx="105" cy="70" rx="7"   ry="8.5"  fill="#7a4820"/>
+        <!-- Inner light reflection -->
+        <ellipse cx="73"  cy="70" rx="3.5" ry="4.5"  fill="#a06030" opacity="0.6"/>
+        <ellipse cx="105" cy="70" rx="3.5" ry="4.5"  fill="#a06030" opacity="0.6"/>
+        <!-- Shine dots -->
+        <circle cx="77"  cy="65" r="3.2" fill="white"/>
+        <circle cx="109" cy="65" r="3.2" fill="white"/>
+        <circle cx="80"  cy="63" r="1.3" fill="white"/>
+        <circle cx="112" cy="63" r="1.3" fill="white"/>
         <!-- Lashes -->
-        <line x1="64"  y1="61" x2="61"  y2="57" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
-        <line x1="67"  y1="59" x2="65"  y2="55" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
-        <line x1="71"  y1="58" x2="70"  y2="54" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
-        <line x1="114" y1="61" x2="117" y2="57" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
-        <line x1="111" y1="59" x2="113" y2="55" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
-        <line x1="107" y1="58" x2="108" y2="54" stroke="#333" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="63"  y1="62" x2="60"  y2="58" stroke="#2a1008" stroke-width="2"   stroke-linecap="round"/>
+        <line x1="67"  y1="60" x2="65"  y2="56" stroke="#2a1008" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="71"  y1="59" x2="70"  y2="55" stroke="#2a1008" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="115" y1="62" x2="118" y2="58" stroke="#2a1008" stroke-width="2"   stroke-linecap="round"/>
+        <line x1="111" y1="60" x2="113" y2="56" stroke="#2a1008" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="107" y1="59" x2="108" y2="55" stroke="#2a1008" stroke-width="1.8" stroke-linecap="round"/>
       </g>
-      <!-- Eyes happy (star sparkle) -->
+      <!-- Eyes happy (sparkle stars, Uraraka's classic happy look) -->
       <g id="gh" display="none">
-        <text x="73"  y="76" font-size="18" text-anchor="middle" fill="#f0c030">✦</text>
-        <text x="105" y="76" font-size="18" text-anchor="middle" fill="#f0c030">✦</text>
+        <text x="73"  y="78" font-size="20" text-anchor="middle" fill="#f0c030">✦</text>
+        <text x="105" y="78" font-size="20" text-anchor="middle" fill="#f0c030">✦</text>
       </g>
 
-      <!-- Mouth normal -->
-      <path id="gm-n" d="M78 84 Q89 92 100 84" stroke="#c07858" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <!-- Mouth normal (Uraraka's sweet smile) -->
+      <path id="gm-n" d="M77 88 Q89 96 101 88" stroke="#b07050" stroke-width="2.2" fill="none" stroke-linecap="round"/>
       <!-- Mouth happy -->
-      <path id="gm-h" d="M73 82 Q89 100 105 82" stroke="#c07858" stroke-width="2.5" fill="#ffb09a" stroke-linecap="round" display="none"/>
+      <path id="gm-h" d="M72 86 Q89 104 106 86" stroke="#b07050" stroke-width="2.5" fill="#ffb09a" stroke-linecap="round" display="none"/>
 
-      <!-- Blush -->
-      <ellipse id="gb-l" cx="57"  cy="79" rx="10" ry="6" fill="#ffb3c1" opacity="0.75" display="none"/>
-      <ellipse id="gb-r" cx="121" cy="79" rx="10" ry="6" fill="#ffb3c1" opacity="0.75" display="none"/>
+      <!-- Blush (happy only) -->
+      <ellipse id="gb-l" cx="55"  cy="82" rx="11" ry="6" fill="#ffb3c1" opacity="0.75" display="none"/>
+      <ellipse id="gb-r" cx="123" cy="82" rx="11" ry="6" fill="#ffb3c1" opacity="0.75" display="none"/>
     </svg>
 
     <div class="btns">
       <button class="btn btn-send" onclick="storeHug('for-him')">🤗 Send him a hug</button>
-      <button class="btn btn-use" id="use-for-him" onclick="useHug('for-him')">💝 He uses a hug</button>
+      <button class="btn btn-use" id="use-for-her" onclick="useHug('for-her')">💝 Use a hug</button>
     </div>
   </div>
 </div>
@@ -413,7 +421,6 @@
   const OVERFLOW = 27;
   let lastActionMs = 0;
 
-  // ── Fetch & display ──────────────────────────────────
   async function fetchCounts() {
     if (Date.now() - lastActionMs < 7000) return;
     try {
@@ -427,6 +434,8 @@
 
   function updateDisplay(which, count, animate) {
     const isHer = which === 'for-her';
+    // for-her (he sends) → updates girl's jar (count-for-him elem in girl SVG)
+    // for-him (she sends) → updates boy's jar (count-for-her elem in boy SVG)
     const countEl = document.getElementById(isHer ? 'count-for-him' : 'count-for-her');
     countEl.textContent = count;
 
@@ -441,18 +450,15 @@
     document.getElementById(isHer ? 'overflow-for-him' : 'overflow-for-her')
       .setAttribute('display', over ? '' : 'none');
 
-    // Update jar fill level (fills up to OVERFLOW)
     const fillId = isHer ? 'girl-jar-fill' : 'boy-jar-fill';
     const fill = document.getElementById(fillId);
-    const pct = Math.min(count / OVERFLOW, 1);
     const maxH = 46, bottom = 216;
-    const h = pct * maxH;
+    const h = Math.min(count / OVERFLOW, 1) * maxH;
     fill.setAttribute('height', String(Math.max(h, 0)));
     fill.setAttribute('y', String(bottom - h));
 
-    // Receiver goes happy when overflow
-    if (isHer) setGirlHappy(over);  // she's the receiver of his hugs
-    else        setBoyHappy(over);   // he's the receiver of her hugs
+    if (isHer) setGirlHappy(over);
+    else        setBoyHappy(over);
   }
 
   function setBoyHappy(on) {
@@ -469,10 +475,9 @@
     document.getElementById(id).setAttribute('display', show ? '' : 'none');
   }
 
-  // ── Actions ──────────────────────────────────────────
   async function storeHug(which) {
     lastActionMs = Date.now();
-    flyHug(which);   // animate immediately, don't wait for server
+    flyHug(which);
     try {
       const r = await fetch(`/api/hugs/${which}/store`, { method: 'POST' });
       if (!r.ok) { showMsg('Oops, try again…'); return; }
@@ -494,10 +499,7 @@
     } catch { showMsg('Something went wrong…'); }
   }
 
-  // ── Flying heart animation ────────────────────────────
   function jarScreenPos(which) {
-    // Boy's jar: SVG coords (141, 193) in viewBox 160×280
-    // Girl's jar: SVG coords (19, 193) in viewBox 160×280
     if (which === 'for-her') {
       const r = document.getElementById('boy-svg').getBoundingClientRect();
       return { x: r.left + r.width * (141/160), y: r.top + r.height * (193/280) };
@@ -510,7 +512,6 @@
   function flyHug(which) {
     const layer = document.getElementById('fly');
     const from = jarScreenPos(which);
-    // Target: the OTHER person's jar
     const to   = jarScreenPos(which === 'for-her' ? 'for-him' : 'for-her');
     const arcPeak = Math.min(from.y, to.y) - 90;
     const midX = (from.x + to.x) / 2;
@@ -521,13 +522,11 @@
         h.textContent = i === 0 ? '🤗' : '💕';
         h.style.cssText = 'position:fixed;font-size:1.5rem;left:0;top:0;pointer-events:none;';
         layer.appendChild(h);
-
-        const delay = i * 60;
         h.animate([
-          { transform: `translate(${from.x}px,${from.y}px) scale(1)`,   opacity: 1 },
-          { transform: `translate(${midX + (Math.random()-0.5)*40}px,${arcPeak - i*18}px) scale(1.5)`, opacity: 1 },
-          { transform: `translate(${to.x}px,${to.y}px) scale(0.5)`,     opacity: 0 }
-        ], { duration: 1100 + i * 80, delay, easing: 'ease-in-out', fill: 'forwards' })
+          { transform: `translate(${from.x}px,${from.y}px) scale(1)`,                                    opacity: 1 },
+          { transform: `translate(${midX + (Math.random()-0.5)*40}px,${arcPeak - i*18}px) scale(1.5)`,   opacity: 1 },
+          { transform: `translate(${to.x}px,${to.y}px) scale(0.5)`,                                      opacity: 0 }
+        ], { duration: 1100 + i*80, delay: i*120, easing: 'ease-in-out', fill: 'forwards' })
           .onfinish = () => h.remove();
       }, i * 120);
     }
@@ -548,7 +547,6 @@
     }
   }
 
-  // ── Message toast ─────────────────────────────────────
   function showMsg(text) {
     const el = document.getElementById('msg');
     el.textContent = text;
